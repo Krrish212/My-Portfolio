@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>An End-to-End NLP Sentiment Pipeline, Built Incrementally — Krishang Sharma</title>
+<meta name="description" content="Classifying 4,000 IMDb reviews by hand-building every stage — cleaning, tokenisation, vectorisation, weighting, and a Naive Bayes classifier written from scratch — and changing exactly one thing at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../case-study.css">
+<link rel="stylesheet" href="../nlp-case-study.css">
+</head>
+<body>
+
+<canvas class="plexus" aria-hidden="true"></canvas>
+
+<nav class="nav">
+  <div class="nav__mark">KS<span>.</span>dev</div>
+  <div class="nav__links">
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<!-- cs--static: this page's only motion is the background canvas and the
+     demo responding to typing, so the shared card lift+glow is opted out. -->
+<div class="cs cs--static">
+
+<!-- ============ HERO ============ -->
+<header class="cs-wrap">
+  <a class="cs-back" href="../index.html#projects">← Back to projects</a>
+  <div class="cs-hero">
+    <p class="cs-eyebrow">Coursework · Natural Language Processing</p>
+    <h1>An End-to-End NLP Sentiment Pipeline, Built Incrementally</h1>
+    <p class="cs-lede">
+      Classifying 4,000 IMDb reviews by hand-building every stage — cleaning,
+      tokenisation, vectorisation, weighting, and a Naive Bayes classifier written
+      from scratch — and changing exactly one thing at a time.
+    </p>
+  </div>
+
+  <div class="cs-band">
+    <div class="cs-pills">
+      <span class="cs-pill">Python</span>
+      <span class="cs-pill">NLTK</span>
+      <span class="cs-pill">scikit-learn</span>
+      <span class="cs-pill">spaCy</span>
+      <span class="cs-pill">NumPy / SciPy sparse</span>
+      <span class="cs-pill">Naive Bayes from scratch</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 OVERVIEW ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">01</span><span class="t">Overview</span><span class="rule"></span></div>
+
+  <div class="cs-stats">
+    <div class="cs-stat">
+      <div class="fig">84.2%</div>
+      <div class="cap">Held-out test accuracy, pipeline frozen before the split was opened</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">613,482</div>
+      <div class="cap">Feature dimensions in the final representation</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">0.0000</div>
+      <div class="cap">Accuracy gap between my Naive Bayes and scikit-learn's</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">29</div>
+      <div class="cap">Development-set experiments run to isolate each choice</div>
+    </div>
+  </div>
+
+  <h2>Text is noisy. Most of the work is deciding what to throw away.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p>
+        Binary sentiment classification over a balanced subset of the Large Movie Review
+        Dataset: 2,000 positive and 2,000 negative reviews, labelled from star ratings
+        (≤4 negative, ≥7 positive) with neutral reviews excluded.
+      </p>
+      <p>
+        The interesting part isn't the accuracy number. It's that every design decision had
+        to be earned. I split the data 70/15/15 with stratified sampling, then built the
+        pipeline one component at a time — each change evaluated on the development set
+        alone, kept only if it helped, and the test set opened exactly once at the end.
+      </p>
+    </div>
+    <div>
+      <p>
+        That discipline is what makes the results readable. When accuracy moves, I can name
+        the single cause.
+      </p>
+      <p>
+        The winning configuration turned out to be the least clever one available:
+        lowercased text with stop words removed, lexical unigrams through trigrams, no
+        frequency cutoff, raw counts, and Multinomial Naive Bayes. Every weighting scheme
+        I tried made it worse.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 PIPELINE ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">02</span><span class="t">Pipeline</span><span class="rule"></span></div>
+  <h2>Eight stages, one variable changed at a time.</h2>
+  <p class="cs-secintro">
+    Raw text is variable, noisy and high-dimensional. Every stage below either removes
+    variation that doesn't carry sentiment, or adds structure that does. Each one was
+    tested in isolation against the development set before the next was added.
+  </p>
+
+  <div class="cs-stages">
+    <div class="cs-stage">
+      <span class="idx">01</span>
+      <div>
+        <div class="name">Sanitise</div>
+        <div class="what">Lowercase, strip HTML tags and URLs with regex, replace punctuation with whitespace rather than deleting it (so <code>great,I</code> doesn't fuse), collapse repeated whitespace.</div>
+      </div>
+      <span class="nlp-verdict keep">KEPT</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">02</span>
+      <div>
+        <div class="name">Tokenise &amp; normalise</div>
+        <div class="what">Whitespace tokens vs Porter stemming vs WordNet lemmatisation. Stemming cut the vocabulary by 31% but lost accuracy — <code>absolut</code> and <code>amazing</code> aren't cheaper if they're also less informative.</div>
+      </div>
+      <span class="nlp-verdict drop">RAW TOKENS WON</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">03</span>
+      <div>
+        <div class="name">Stop word removal</div>
+        <div class="what">NLTK's English stop list, applied globally. Removed only 151 vocabulary items but a large share of total tokens — the biggest single-line accuracy gain in the project.</div>
+      </div>
+      <span class="nlp-verdict keep">+1.50 pts</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">04</span>
+      <div>
+        <div class="name">Lexical n-grams</div>
+        <div class="what">Sliding window over the token sequence for n ∈ [1,3]. Sentiment lives in local composition — <code>not good</code> inverts <code>good</code>, and a unigram model can't see that.</div>
+      </div>
+      <span class="nlp-verdict keep">+2.33 pts</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">05</span>
+      <div>
+        <div class="name">Syntactic features</div>
+        <div class="what">PoS unigrams (<code>POS_JJ</code>) and adjacent-tag bigrams (<code>POSPAT_JJ_NN</code>) from NLTK's tagger, appended to the lexical features. Also explored spaCy noun-phrase chunking and adjective up-weighting.</div>
+      </div>
+      <span class="nlp-verdict drop">DROPPED</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">06</span>
+      <div>
+        <div class="name">Vectorise</div>
+        <div class="what">Document–term matrix over the training vocabulary only, held as a sparse CSR matrix. Dev and test are transformed with the fitted vocabulary — never re-fitted.</div>
+      </div>
+      <span class="nlp-verdict keep">KEPT</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">07</span>
+      <div>
+        <div class="name">Weight</div>
+        <div class="what">Raw counts vs L2 row normalisation vs TF–IDF vs PPMI word–class association. All three transformations underperformed doing nothing.</div>
+      </div>
+      <span class="nlp-verdict drop">RAW COUNTS WON</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">08</span>
+      <div>
+        <div class="name">Classify</div>
+        <div class="what">Multinomial Naive Bayes implemented from scratch, cross-checked against scikit-learn, and benchmarked against a decision tree and an SGD logistic model.</div>
+      </div>
+      <span class="nlp-verdict keep">KEPT</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 REPRESENTATION ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">03</span><span class="t">Representation</span><span class="rule"></span></div>
+  <h2>Before a model can read a review, it has to become a vector.</h2>
+  <p class="cs-secintro">
+    Type into the box to watch the first three stages run — cleaning, stop word filtering,
+    then n-gram expansion into the feature space.
+  </p>
+
+  <div class="nlp-demo">
+    <label class="sr-only" for="nlp-demo-input">Sample review text</label>
+    <textarea id="nlp-demo-input" spellcheck="false">&lt;br /&gt;This movie was not very good, but the acting was absolutely Brilliant!!!</textarea>
+    <div class="nlp-steps">
+      <div class="nlp-step">
+        <h4>01 — SANITISED</h4>
+        <div class="nlp-out" id="nlp-out-clean"></div>
+      </div>
+      <div class="nlp-step">
+        <h4>02 — TOKENS, STOP WORDS FILTERED</h4>
+        <div class="nlp-out" id="nlp-out-tokens"></div>
+      </div>
+      <div class="nlp-step">
+        <h4>03 — N-GRAM FEATURES (1–3)</h4>
+        <div class="nlp-out" id="nlp-out-ngrams"></div>
+        <span class="nlp-count" id="nlp-out-count"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="nlp-note">
+    One review of fourteen words expands into dozens of features. Across 2,800 training
+    documents this produced a 613,482-dimensional space in which almost every cell is zero —
+    which is precisely why the matrix is stored sparsely and why a model with strong
+    independence assumptions holds up so well.
+  </p>
+</section>
+
+<!-- ============ 04 WEIGHTING ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">04</span><span class="t">Weighting</span><span class="rule"></span></div>
+  <h2>Three weighting schemes. None of them beat raw counts.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p>
+        A document–term matrix treats each review as a point in vocabulary-space, one axis
+        per feature. That representation is honest but skewed: Zipf's law means a handful of
+        terms dominate every document, so the standard move is to reweight the axes before
+        classifying. I implemented three schemes and none of them helped.
+      </p>
+      <p>
+        <strong>L2 normalisation</strong> rescales each row to unit length so long reviews
+        don't shout over short ones. <strong>TF–IDF</strong> multiplies term frequency by an
+        inverse document frequency term, suppressing anything that appears everywhere.
+        <strong>PPMI</strong> is the one I found most interesting — instead of measuring
+        rarity, it measures association between a feature and a class.
+      </p>
+
+      <div class="cs-eq" style="text-align:left; line-height:1.9">
+        PMI(w, y) = log[ P(w, y) / (P(w) · P(y)) ]<br>
+        PPMI(w, y) = max( PMI(w, y), 0 )<br>
+        <span style="color:var(--dim); font-size:13px">weight(w) = max over classes y</span>
+      </div>
+
+      <p>
+        Zero means the word and the class are independent; positive means the word shows up
+        with that class more than chance predicts. Clipping negatives keeps only the
+        informative direction. Weights are learned on the training split alone and then
+        applied as a column scaling to dev and test — computing them on the full corpus
+        would leak the labels.
+      </p>
+    </div>
+
+    <div>
+      <div class="cs-tablewrap nlp-tablewrap">
+        <table class="nlp-table">
+          <thead>
+            <tr><th>Weighting</th><th class="n">Dev acc.</th><th class="n">Δ</th></tr>
+          </thead>
+          <tbody>
+            <tr class="nlp-win"><td class="cfg">Raw counts</td><td class="n">0.8436</td><td class="n">—</td></tr>
+            <tr><td class="cfg">PPMI (word–class)</td><td class="n">0.8403</td><td class="n bad">−0.33</td></tr>
+            <tr><td class="cfg">L2 row normalisation</td><td class="n">0.8286</td><td class="n bad">−1.50</td></tr>
+            <tr><td class="cfg">TF–IDF</td><td class="n">0.8103</td><td class="n bad">−3.33</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cs-panel" style="margin-top:28px">
+        <h3>Why TF–IDF backfired here</h3>
+        <p>
+          IDF assumes that a term appearing in most documents is uninformative. In sentiment
+          that assumption breaks: <code>bad</code>, <code>boring</code> and
+          <code>brilliant</code> are common <em>and</em> decisive. Down-weighting by document
+          frequency strips the signal out. Spread across a 613k-dimensional n-gram space, the
+          surviving weights get small enough that genuinely discriminative phrases stop
+          carrying the decision.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 EXPERIMENTS ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">05</span><span class="t">Experiments</span><span class="rule"></span></div>
+  <h2>Twenty-nine runs. Eleven of them changed something.</h2>
+  <p class="cs-secintro">
+    These are the development-set experiments that moved the pipeline. Each row differs from
+    the one above it by a single component.
+  </p>
+
+  <div class="cs-tablewrap nlp-tablewrap">
+    <table class="nlp-table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Configuration</th>
+          <th class="n">Vocab</th><th class="n">Dev acc.</th><th class="dec">Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="id">A1</td><td class="cfg">Unigrams, raw counts, stop words kept</td><td class="n">29,615</td><td class="n">0.8053</td><td class="dec nlp-base">baseline</td></tr>
+        <tr><td class="id">A2</td><td class="cfg">+ Porter stemming</td><td class="n">20,466</td><td class="n">0.7987</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A3</td><td class="cfg">+ WordNet lemmatisation</td><td class="n">26,508</td><td class="n">0.8037</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A5</td><td class="cfg">+ stop word removal</td><td class="n">29,464</td><td class="n">0.8203</td><td class="dec nlp-keep">keep</td></tr>
+        <tr><td class="id">A7</td><td class="cfg">+ bigrams</td><td class="n">292,064</td><td class="n">0.8419</td><td class="dec nlp-keep">keep</td></tr>
+        <tr class="nlp-win"><td class="id">A8</td><td class="cfg">+ trigrams</td><td class="n">613,482</td><td class="n">0.8436</td><td class="dec nlp-keep">keep</td></tr>
+        <tr><td class="id">A9.1</td><td class="cfg">+ PoS unigrams</td><td class="n">292,100</td><td class="n">0.8336</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A9.2</td><td class="cfg">+ PoS unigrams &amp; bigrams</td><td class="n">292,100</td><td class="n">0.8303</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A12</td><td class="cfg">min frequency ≥ 2</td><td class="n">47,898</td><td class="n">0.8319</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A14</td><td class="cfg">min frequency ≥ 4</td><td class="n">16,319</td><td class="n">0.8153</td><td class="dec nlp-drop">reject</td></tr>
+        <tr><td class="id">A19</td><td class="cfg">+ PPMI weighting</td><td class="n">613,482</td><td class="n">0.8403</td><td class="dec nlp-drop">reject</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="nlp-note">
+    The frequency-threshold sweep is the clearest trade-off in the set: raising the cutoff
+    from 1 to 2 deletes 92% of the vocabulary and costs a full point of accuracy. Rare
+    trigrams are sparse, but they aren't noise — a phrase seen once in training is still
+    evidence. With a probabilistic model and Laplace smoothing absorbing the tail, there was
+    no reason to prune.
+  </p>
+</section>
+
+<!-- ============ 06 CLASSIFIER ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">06</span><span class="t">Classifier</span><span class="rule"></span></div>
+  <h2>Naive Bayes, derived from Bayes' theorem and rebuilt.</h2>
+  <p class="cs-secintro">
+    I wrote the classifier from scratch rather than calling it, because the assumptions are
+    the whole story — and because matching a reference implementation exactly is the only
+    real proof you understood them.
+  </p>
+
+  <div class="cs-two">
+    <div>
+      <ol class="nlp-derivation">
+        <li>
+          <span class="step">P(c | x) = P(c) · P(x | c) / P(x)</span>
+          <p>Bayes' theorem. The posterior we want, in terms of a prior we can count and a likelihood we can model.</p>
+        </li>
+        <li>
+          <span class="step">P(c | x) ∝ P(c) · P(x | c)</span>
+          <p>The evidence P(x) is identical across classes, so it can't change the argmax. Drop it.</p>
+        </li>
+        <li>
+          <span class="step">P(x | c) = ∏ᵢ P(xᵢ | c)</span>
+          <p>The naive assumption: features are conditionally independent given the class. False for language — but the errors it introduces are largely symmetric across classes, so the ranking survives.</p>
+        </li>
+        <li>
+          <span class="step">θ_c,i = (N(wᵢ,c) + α) / (Σⱼ N(wⱼ,c) + αV)</span>
+          <p>Multinomial likelihood with Laplace smoothing. Without α, one unseen feature drives the entire product to zero. Tuning on dev gave α = 1.0.</p>
+        </li>
+        <li>
+          <span class="step">ĉ = argmax [ log P(c) + Σᵢ xᵢ · log P(wᵢ|c) ]</span>
+          <p>Move to log space. Multiplying 613,482 small probabilities underflows float64; summing logs turns the whole scoring step into one sparse matrix–matrix product.</p>
+        </li>
+      </ol>
+    </div>
+
+    <div>
+<pre class="cs-code"><span class="cm"># Fit: class priors + smoothed per-class feature log-probs</span>
+<span class="kw">for</span> ci, c <span class="kw">in</span> enumerate(self.classes_):
+    X_c        = X[y == c]
+    N_c[ci]    = (y == c).sum()
+    N_w_c[ci]  = np.asarray(X_c.sum(axis=<span class="fn">0</span>)).ravel()
+
+self.class_log_prior_ = np.log(N_c / N_c.sum())
+
+smoothed = N_w_c + alpha
+N_dot_c  = smoothed.sum(axis=<span class="fn">1</span>, keepdims=<span class="kw">True</span>)
+self.feature_log_prob_ = np.log(smoothed / N_dot_c)
+
+<span class="cm"># Predict: the entire argmax is one sparse product</span>
+jll = X @ self.feature_log_prob_.T
+jll = np.asarray(jll) + self.class_log_prior_
+<span class="kw">return</span> self.classes_[jll.argmax(axis=<span class="fn">1</span>)]</pre>
+
+      <div class="cs-panel" style="margin-top:26px">
+        <h3>Verification</h3>
+        <p>
+          The from-scratch model and <code>sklearn.naive_bayes.MultinomialNB</code> returned
+          identical test accuracy to four decimal places on the frozen pipeline — 0.8417
+          against 0.8417. Identical, not merely close, which is the result you should expect
+          when the maths lines up and the smoothing constant matches.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 RESULTS ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">07</span><span class="t">Results</span><span class="rule"></span></div>
+  <h2>The simplest model won. The most flexible one collapsed.</h2>
+  <p class="cs-secintro">
+    The feature pipeline was frozen on development-set evidence alone, then evaluated once
+    on the held-out test split.
+  </p>
+
+  <div class="cs-two">
+    <div>
+      <div class="cs-tablewrap nlp-tablewrap">
+        <table class="nlp-table">
+          <thead>
+            <tr><th>Classifier</th><th class="n">Test acc.</th></tr>
+          </thead>
+          <tbody>
+            <tr class="nlp-win"><td class="cfg">Naive Bayes — from scratch</td><td class="n">0.8417</td></tr>
+            <tr class="nlp-win"><td class="cfg">Naive Bayes — scikit-learn</td><td class="n">0.8417</td></tr>
+            <tr><td class="cfg">Linear model (SGD, logistic loss)</td><td class="n">0.8383</td></tr>
+            <tr><td class="cfg">Decision tree (max depth 100)</td><td class="n">0.6983</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <p>
+        The decision tree's 14-point collapse is the informative failure. Axis-aligned splits
+        need individual features that partition the data, but in a 613,482-dimensional space
+        where each feature fires in a handful of documents, no single split carries much
+        information — the tree memorises the training set and generalises badly.
+      </p>
+      <p>
+        Naive Bayes goes the other way. It accumulates weak evidence additively across every
+        feature present, which is exactly the right inductive bias when the signal is spread
+        thin across a very wide, very sparse matrix.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 TAKEAWAY ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">08</span><span class="t">Takeaway</span><span class="rule"></span></div>
+  <h2>Every technique that discarded information cost accuracy.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p class="cs-lede" style="margin:0 0 18px">
+        Stemming, PoS abstraction, frequency pruning, IDF down-weighting — each one lost
+        ground. Everything that preserved lexical detail gained it.
+      </p>
+      <p>
+        That isn't a universal law; it's what 4,000 documents and a bag-of-words model will
+        tell you. But arriving at it through controlled, single-variable experiments rather
+        than assumption is the part that transfers. The honest conclusion of this project is
+        that the sophisticated options lost, and I have the ablation table to prove it.
+      </p>
+    </div>
+    <div>
+      <p>
+        The ceiling here is the representation, not the classifier. Bag-of-words discards
+        order beyond a three-token window and treats <code>brilliant</code> and
+        <code>superb</code> as unrelated axes. Contextual embeddings dissolve both limits,
+        which is the direction I've taken the work since — into dense retrieval, vector
+        similarity and RAG systems, where the same questions about what a good representation
+        is come back in a different form.
+      </p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer class="wrap">
+  <div>© 2026 Krishang Sharma</div>
+  <div class="social">
+    <a href="https://www.linkedin.com/in/krishang-sharma1/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:krishangs468@gmail.com">Email</a>
+    <a href="https://github.com/Krrish212" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+<script src="../nlp-demo.js"></script>
+</body>
+</html>

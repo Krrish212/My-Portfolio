@@ -1,0 +1,865 @@
+/* ============================================
+   CASE STUDY PAGE
+   Scoped under .cs so nothing here collides with the
+   site's .section / .wrap / footer rules.
+   Fonts come from the site's tokens; the palette below
+   is the case study's own.
+   ============================================ */
+.cs {
+  --obsidian: #08080A;
+  --panel: rgba(255, 255, 255, 0.022);
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --cs-text: #F2F2F4;
+  --muted: #7A7A85;
+  --dim: #55555E;
+  --cs-violet: #8B5CF6;
+  --violet-dim: rgba(139, 92, 246, 0.35);
+  --cs-cyan: #22D3EE;
+  --cyan-dim: rgba(34, 211, 238, 0.30);
+  --rose: #E2708A;
+  /* already the Dojo card accent in experience-data.js — not a new hue */
+  --emerald: #34D399;
+  /* caution, not failure: reserved for callouts that qualify a result */
+  --amber: #FBBF24;
+  --gut: clamp(20px, 5vw, 48px);
+  --max: 1120px;
+
+  position: relative;
+  z-index: 1;
+  color: var(--cs-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+}
+body:has(.cs) { background: #08080A; }
+
+/* Longhands only. A `padding` shorthand here writes all four sides and, being
+   a class, outranks the element-level section rule — silently zeroing every
+   section's vertical padding. */
+.cs-wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-left: var(--gut);
+  padding-right: var(--gut);
+}
+
+/* ---- type ---- */
+.cs-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--cs-violet);
+  margin: 0 0 26px;
+}
+
+/* ---- section headers ---- */
+.cs-sechead { display: flex; align-items: center; gap: 22px; margin-bottom: 44px; }
+.cs-sechead .n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1;
+  font-size: clamp(30px, 3.8vw, 46px);
+  letter-spacing: -.03em;
+  color: var(--cs-violet);
+}
+.cs-sechead .t {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(14px, 1.7vw, 18px);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--cs-text);
+  white-space: nowrap;
+}
+.cs-sechead .rule { flex: 1; height: 1px; background: var(--line); min-width: 24px; }
+
+.cs h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(38px, 6.4vw, 74px);
+  line-height: 1.06;
+  letter-spacing: -.028em;
+  margin: 0;
+  max-width: 16ch;
+}
+.cs h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(25px, 3.2vw, 38px);
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  margin: 0 0 26px;
+  max-width: 22ch;
+}
+.cs h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+.cs p { margin: 0 0 18px; color: #C3C3CC; max-width: 70ch; }
+.cs p strong { color: var(--cs-text); font-weight: 500; }
+
+/* ---- hero ---- */
+.cs-back {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  display: inline-block;
+  padding-top: 64px;
+  transition: color .2s;
+}
+.cs-back:hover { color: var(--cs-text); }
+.cs-hero { padding-top: 76px; }
+.cs-lede {
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.6;
+  color: #A8A8B4;
+  max-width: 60ch;
+  margin: 34px 0 4px;
+  font-weight: 400;
+}
+
+.cs-herotop { display: grid; grid-template-columns: 1fr auto; gap: 64px; align-items: start; }
+.cs-actcol { display: flex; flex-direction: column; gap: 14px; padding-top: 16px; width: 262px; }
+.cs-actcard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .015);
+  border: 1px solid var(--line-strong);
+  transition: transform .25s cubic-bezier(.22, .61, .36, 1), background .25s, border-color .25s, box-shadow .25s;
+}
+.cs-actcard svg { flex-shrink: 0; }
+.cs-actcard .lab {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--cs-text);
+  letter-spacing: .04em;
+  display: block;
+}
+.cs-actcard .sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--dim);
+  letter-spacing: .06em;
+  margin-top: 4px;
+  display: block;
+}
+.cs-actcard--v { border-color: rgba(139, 92, 246, .42); background: rgba(139, 92, 246, .05); }
+.cs-actcard--v:hover {
+  background: rgba(139, 92, 246, .13);
+  border-color: var(--cs-violet);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px -14px rgba(139, 92, 246, .55);
+}
+.cs-actcard--c { border-color: rgba(34, 211, 238, .38); background: rgba(34, 211, 238, .045); }
+.cs-actcard--c:hover {
+  background: rgba(34, 211, 238, .12);
+  border-color: var(--cs-cyan);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px -14px rgba(34, 211, 238, .5);
+}
+
+/* ---- stack band ---- */
+.cs-band {
+  margin-top: 80px;
+  padding-top: 34px;
+  padding-bottom: 36px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 26px;
+  justify-content: space-between;
+}
+.cs-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.cs-pill {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: .07em;
+  border-radius: 100px;
+  padding: 9px 18px;
+  white-space: nowrap;
+  color: #C9B2FF;
+  border: 1px solid rgba(139, 92, 246, .45);
+  background: rgba(139, 92, 246, .10);
+  transition: background .22s, border-color .22s, transform .22s;
+}
+.cs-pill:hover { background: rgba(139, 92, 246, .20); border-color: var(--cs-violet); transform: translateY(-1px); }
+
+/* ---- sections ---- */
+.cs section { padding-top: 90px; padding-bottom: 90px; }
+.cs section + section { border-top: 1px solid rgba(255, 255, 255, .05); }
+/* normalise trailing margins so every section gap is identical */
+.cs section > *:last-child { margin-bottom: 0; }
+.cs section > *:last-child > *:last-child { margin-bottom: 0; }
+
+/* ---- 01 stats ---- */
+.cs-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 52px;
+}
+.cs-stat { background: #0B0B0D; padding: 26px 22px 24px; position: relative; }
+.cs-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 22px; right: 22px;
+  height: 1px;
+  background: var(--violet-dim);
+}
+.cs-stat .fig {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(27px, 3.4vw, 38px);
+  letter-spacing: -.03em;
+  line-height: 1;
+  color: var(--cs-cyan);
+}
+.cs-stat .cap {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-top: 12px;
+  letter-spacing: .02em;
+}
+/* One gradient bar across the whole strip instead of four short ones over
+   each stat. Inset from the edges so it reads as an accent, not a border. */
+.cs-stats--bar { position: relative; }
+.cs-stats--bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 32px; right: 32px;
+  height: 2px;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--cs-violet), rgba(139, 92, 246, .15));
+}
+.cs-stats--bar .cs-stat::before { display: none; }
+
+/* ---- 02 architecture ---- */
+.cs-archgrid { display: grid; grid-template-columns: 1.95fr 1fr; gap: 76px; align-items: start; }
+.cs-diagram {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .012);
+  padding: 26px 24px;
+}
+.cs-diagram svg { width: 100%; height: auto; display: block; }
+.cs-eq {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: .01em;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 26px 18px;
+  background: rgba(255, 255, 255, .015);
+  margin-bottom: 30px;
+  text-align: center;
+}
+.cs-eq .ex { color: var(--cs-cyan); }
+.cs-eq .dv { color: var(--cs-violet); }
+.cs-eq .lam { color: #C4A9FF; }
+.cs-notes { list-style: none; margin: 0; padding: 0; }
+.cs-notes li { padding: 22px 0; border-top: 1px solid rgba(255, 255, 255, .06); }
+.cs-notes li:first-child { border-top: none; padding-top: 0; }
+.cs-notes b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cs-violet);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.cs-notes span { font-size: 16px; line-height: 1.65; color: #B7B7C2; }
+
+/* ---- 03 table ---- */
+.cs-tablewrap { border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+.cs table { width: 100%; border-collapse: collapse; min-width: 800px; }
+.cs thead th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 400;
+  text-align: left;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .018);
+}
+.cs thead th.n, .cs tbody td.n { text-align: right; }
+.cs tbody td {
+  padding: 15px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, .045);
+  font-size: 14px;
+  color: #B6B6C1;
+  vertical-align: middle;
+}
+.cs tbody tr:last-child td { border-bottom: none; }
+.cs tbody tr { transition: background .2s; }
+.cs tbody tr:hover { background: rgba(255, 255, 255, .022); }
+.cs tbody td.idx { font-family: var(--font-mono); font-size: 12px; color: var(--dim); width: 44px; }
+.cs tbody td.cfg { color: var(--cs-text); font-size: 14.5px; }
+.cs tbody td.n { font-family: var(--font-mono); font-size: 13px; color: #D0D0D8; }
+.cs .good { color: var(--cs-cyan) !important; }
+.cs .bad { color: var(--rose) !important; }
+.cs tr.win td { background: rgba(139, 92, 246, .055); }
+.cs tr.win:hover td { background: rgba(139, 92, 246, .085); }
+.cs tr.win td.cfg { color: #fff; font-weight: 500; }
+.cs tr.win td.n { color: var(--cs-cyan); }
+.cs-tnote {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 16px;
+  line-height: 1.7;
+  letter-spacing: .02em;
+}
+
+/* ---- 04 finding ---- */
+.cs-findgrid { display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: start; }
+.cs-pull {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(20px, 2.5vw, 27px);
+  line-height: 1.34;
+  letter-spacing: -.018em;
+  color: var(--cs-text);
+  border-left: 2px solid var(--cs-violet);
+  padding: 2px 0 2px 26px;
+  margin: 0 0 34px;
+  max-width: 34ch;
+}
+.cs-chartcard {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px 20px 18px;
+  background: rgba(255, 255, 255, .012);
+}
+.cs-chartcard h3 { margin-bottom: 4px; }
+.cs-chartcard .sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--dim);
+  letter-spacing: .05em;
+  margin-bottom: 20px;
+}
+.cs-chartcard svg { width: 100%; height: auto; display: block; }
+.cs-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.cs-legend i {
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+
+/* ---- 05 skills ---- */
+.cs-skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.cs-skill {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 26px 24px 24px;
+  background: rgba(255, 255, 255, .012);
+  display: flex;
+  flex-direction: column;
+}
+.cs-skill .tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 10px;
+}
+.cs-skill h3 { font-size: 19px; font-weight: 700; margin-bottom: 16px; }
+.cs-bias {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .05);
+  margin-bottom: 9px;
+}
+.cs-bias i { display: block; height: 100%; }
+.cs-bias .l { background: var(--cs-cyan); }
+.cs-bias .f { background: #4B4B55; }
+.cs-bias .s { background: var(--cs-violet); }
+.cs-biaslab {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: .04em;
+  margin-bottom: 20px;
+}
+.cs-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(255, 255, 255, .055);
+  font-size: 13px;
+}
+.cs-kv dt { color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em; }
+.cs-kv dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--cs-text); }
+.cs-skill .note {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, .055);
+}
+
+/* ---- 06 transfer ---- */
+.cs-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cs-chartnote {
+  border: none;
+  padding: 0;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #8E8E9A;
+  line-height: 1.6;
+}
+
+/* ---- 2x2 card grid ---- */
+.cs-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cs-gcard { background: #0B0B0D; padding: 28px 26px; }
+.cs-gcard h3 { font-size: 16px; margin-bottom: 10px; }
+.cs-gcard p { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.64; max-width: none; }
+
+/* Inline metric / identifier names. The bordered variant lives in the
+   codebase cards; running prose uses the unboxed one. */
+.cs code { font-family: var(--font-mono); font-size: 13px; color: #C9B2FF; }
+.cs-gcard code {
+  font-size: 12.5px;
+  background: rgba(139, 92, 246, .10);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ---- equal two-column prose/content split ---- */
+.cs-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+/* ---- generic bordered panel (aside note, callout) ---- */
+.cs-panel {
+  background: rgba(255, 255, 255, .012);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 26px;
+}
+.cs-panel h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+/* a callout beside primary prose — set a step below it so it reads as an aside */
+.cs-panel p { font-size: 14.5px; line-height: 1.65; max-width: none; }
+.cs-panel p:last-child { margin-bottom: 0; }
+/* caution variant: qualifies a result rather than reporting a failure */
+.cs-panel--warn { border-color: rgba(251, 191, 36, .28); }
+.cs-panel--warn h3 { color: var(--amber); }
+
+/* ---- lead paragraph inside a section ----
+   Distinct from .cs-lede, which is the hero dek. Scoped past `.cs p`
+   (0,1,1), which would otherwise repaint it in body colour. */
+.cs .cs-bodylead { font-size: 18.5px; line-height: 1.6; color: #D6D6DC; }
+
+/* ---- staged process list ----
+   Rows in one bordered container, 1px dividers, no gaps — the same
+   construction as .cs-grid2, laid out vertically. The third column
+   carries a verdict or a tag depending on the page. */
+.cs-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cs-stage {
+  background: #0B0B0D;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: baseline;
+}
+.cs-stage .idx { font-family: var(--font-mono); font-size: 12px; color: var(--dim); }
+.cs-stage .name { font-family: var(--font-display); font-weight: 700; font-size: 15.5px; }
+.cs-stage .what { font-size: 14px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
+.cs-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  color: var(--dim);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 9px;
+}
+
+/* ---- code block ---- */
+.cs-code {
+  background: #0B0B0D;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 22px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: #C6C6CE;
+}
+.cs-code .kw { color: var(--cs-violet); }
+.cs-code .fn { color: var(--cs-cyan); }
+.cs-code .cm { color: #5A5A63; }
+
+/* ---- action button ---- */
+.cs-btnrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 38px; }
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  letter-spacing: .04em;
+  color: var(--cs-text);
+  text-decoration: none;
+  padding: 15px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, .015);
+  position: relative;
+  overflow: hidden;
+  transition: transform .22s cubic-bezier(.22, .61, .36, 1), background .22s, border-color .22s;
+}
+/* the halo lives on a pseudo-element so it can fade independently of the border */
+.cs-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  transition: box-shadow .22s;
+}
+.cs-btn svg { width: 17px; height: 17px; fill: currentColor; flex: none; }
+.cs-btn .arrow { color: var(--cs-violet); transition: transform .22s; }
+.cs-repometa { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .04em; color: var(--dim); }
+
+/* ---- plain table ----
+   No scroll container and no 800px floor: for short tables that
+   should simply reflow. Scoped past the shared `.cs table` rules. */
+.cs .cs-tbl { width: 100%; border-collapse: collapse; min-width: 0; }
+.cs .cs-tbl th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  padding: 0 14px 12px;
+  border-bottom: 1px solid var(--line);
+  background: none;
+}
+.cs .cs-tbl td {
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .045);
+  font-size: 14.5px;
+  color: #C6C6CE;
+}
+.cs .cs-tbl tr:last-child td { border-bottom: none; }
+.cs .cs-tbl th.n, .cs .cs-tbl td.n { text-align: right; }
+.cs .cs-tbl td.n { font-family: var(--font-mono); font-size: 13px; color: var(--cs-text); }
+.cs .cs-tbl td.mono { font-family: var(--font-mono); font-size: 13px; color: var(--cs-cyan); }
+.cs .cs-tbl td.muted { color: var(--muted); }
+/* right-aligned ranking cell: emerald / amber / dim reads as high / medium / low
+   without needing a legend */
+.cs .cs-tbl th.pri, .cs .cs-tbl td.pri { text-align: right; }
+.cs .cs-tbl td.pri { font-family: var(--font-mono); font-size: 12.5px; }
+.cs .cs-tbl td.pri.hi { color: var(--emerald); }
+.cs .cs-tbl td.pri.md { color: var(--amber); }
+.cs .cs-tbl td.pri.lo { color: var(--dim); }
+
+/* ---- figures ---- */
+.cs-figstack { display: flex; flex-direction: column; gap: 26px; }
+.cs-fig {
+  display: block;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .012);
+  overflow: hidden;
+  will-change: transform;
+}
+.cs-fig img { display: block; width: 100%; height: auto; }
+.cs-fig .cap {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .03em;
+  color: var(--dim);
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.cs-fig .cap .t { color: var(--muted); }
+/* for screenshots that carry their own light canvas */
+.cs-fig--light { background: #EAEAED; }
+.cs-fig--light .cap { background: #0B0B0D; }
+.cs-shotnote {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .03em;
+  color: var(--dim);
+  margin-top: 14px;
+}
+/* Figures side by side rather than stacked. --3 for small chart thumbnails. */
+.cs-figgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.cs-figgrid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+/* A figure that breaks out of the 1120px measure — for a single wide artefact
+   (a full wireframe sheet) that is unreadable at column width. The negative
+   margin re-centres the wider box inside the narrower content box; the 64px
+   subtraction keeps a gutter even when 100vw includes a classic scrollbar. */
+.cs-fig--wide { width: 100%; }
+@media (min-width: 1180px) {
+  .cs-fig--wide {
+    width: min(1240px, calc(100vw - 64px));
+    margin-left: calc((100% - min(1240px, 100vw - 64px)) / 2);
+  }
+}
+
+/* ---- icon strip ----
+   Small fixed-width tiles for UI glyphs pulled out of a prototype. */
+.cs-icons { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+.cs-ico {
+  width: 78px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .012);
+  padding: 14px 10px 10px;
+  text-align: center;
+  transition: transform .28s cubic-bezier(.2, .7, .3, 1), box-shadow .28s, border-color .28s;
+}
+.cs-ico img { width: 34px; height: 34px; object-fit: contain; display: block; margin: 0 auto 10px; }
+.cs-ico span { font-family: var(--font-mono); font-size: 10px; color: var(--dim); letter-spacing: .08em; }
+/* marks a glyph added during iteration rather than present from the start */
+.cs-ico--new { border-color: rgba(52, 211, 153, .35); }
+.cs-ico--new span { color: var(--emerald); }
+
+/* ---- ruled section model ----
+   Sections separated by an explicit hairline inside the section rather
+   than a border between them. Opt in with .cs--ruled on the page root. */
+.cs-rule { height: 1px; background: var(--line); margin-top: 88px; }
+.cs--ruled section { padding-top: 88px; padding-bottom: 0; }
+.cs--ruled section + section { border-top: none; }
+
+/* ---- shared small blocks ---- */
+.cs-chartlead { margin-bottom: 44px; }
+.cs-secintro { margin-bottom: 44px; }
+.cs-contrib {
+  margin-top: 34px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 70ch;
+}
+.cs-contrib .lab {
+  display: block;
+  color: var(--cs-violet);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+/* keep the 10^67970 exponent from inflating its line box */
+.cs sup { font-size: .68em; line-height: 0; }
+
+/* ---- reveal ---- */
+.cs .rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s cubic-bezier(.22, .61, .36, 1),
+              transform .7s cubic-bezier(.22, .61, .36, 1);
+}
+.cs .rv.in { opacity: 1; transform: none; }
+
+/* ---- responsive ---- */
+@media (max-width: 940px) {
+  .cs-stats { grid-template-columns: repeat(2, 1fr); }
+  .cs-archgrid, .cs-findgrid, .cs-charts { grid-template-columns: 1fr; gap: 40px; }
+  .cs-skills { grid-template-columns: 1fr; }
+  .cs-grid2 { grid-template-columns: 1fr; }
+  .cs-figgrid, .cs-figgrid--3 { grid-template-columns: minmax(0, 1fr); }
+  .cs-two { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .cs section { padding-top: 59px; padding-bottom: 59px; }
+  .cs--ruled section { padding-top: 64px; padding-bottom: 0; }
+  .cs-rule { margin-top: 64px; }
+  /* the tag drops under the description rather than squeezing the middle column */
+  .cs-stage { grid-template-columns: 22px minmax(0, 1fr); gap: 14px; }
+  .cs-stage > :last-child { grid-column: 2; justify-self: start; margin-top: 6px; }
+  .cs-band { flex-direction: column; align-items: flex-start; }
+  .cs-herotop { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .cs-actcol { flex-direction: row; width: 100%; padding-top: 0; }
+  .cs-actcard { flex: 1; }
+  .cs-sechead { gap: 16px; margin-bottom: 34px; }
+  /* the label is nowrap; let the decorative rule collapse rather than push
+     the header past the viewport on narrow screens */
+  .cs-sechead .rule { min-width: 0; }
+}
+/* A four-column .cs-tbl (id / prose / type / rank) has a min-content floor near
+   360px — wider than the content box on a 375px phone, so it pushes the page
+   sideways. Tighten its own metrics rather than reintroduce a scroll container:
+   the whole point of .cs-tbl is that it reflows. */
+@media (max-width: 560px) {
+  .cs .cs-tbl td { font-size: 13px; }
+  .cs .cs-tbl th, .cs .cs-tbl td { padding-left: 8px; padding-right: 8px; }
+  .cs .cs-tbl th {
+    font-size: 9.5px;
+    letter-spacing: .04em;
+    /* single long headers ("Requirement") otherwise set the floor on their own */
+    overflow-wrap: anywhere;
+  }
+  .cs .cs-tbl td.n, .cs .cs-tbl td.mono, .cs .cs-tbl td.pri { font-size: 11px; }
+}
+@media (max-width: 520px) {
+  .cs-stats { grid-template-columns: 1fr; }
+  /* `.t` is nowrap, so the longest label ("Environment & architecture") sets the
+     header's min-content width. At 360px that exceeds the content box and pushes
+     the row past the viewport. Tighten the label's own metrics rather than let
+     it wrap, which would strand the rule beside a two-line heading. */
+  .cs-sechead .t { font-size: 13px; letter-spacing: .12em; }
+  .cs-sechead .n { font-size: 28px; }
+}
+/* two action cards side by side need ~366px of min-content; below that they
+   would force the hero grid track past the viewport, so stack them again */
+@media (max-width: 380px) {
+  .cs-actcol { flex-direction: column; }
+}
+
+.cs :focus-visible { outline: 2px solid var(--cs-violet); outline-offset: 3px; border-radius: 3px; }
+
+/* ============================================
+   LIFT + GLOW ON EVERY VISUAL CARD
+   Must stay LAST: declared before the base rules that set a `border`
+   shorthand on these selectors, the shorthand re-sets border-color and
+   the glow fails silently on the charts while still working on the diagram.
+   Gated on hover/pointer capability, not width — a narrow desktop window
+   with a mouse still wants it, a wide tablet does not.
+   ============================================ */
+.cs-diagram, .cs-chartcard, .cs-skill, .cs-tablewrap, .cs-gcard, .cs-fig {
+  transition: transform .38s cubic-bezier(.22, .61, .36, 1),
+              box-shadow .38s ease,
+              border-color .38s ease,
+              background-color .38s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cs-diagram:hover, .cs-chartcard:hover, .cs-skill:hover, .cs-tablewrap:hover,
+  .cs-fig:hover, .cs-fig:focus-visible {
+    transform: translateY(-6px) scale(1.014);
+    border-color: rgba(139, 92, 246, .55);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, .22),
+                0 26px 70px -18px rgba(139, 92, 246, .50),
+                0 0 100px -28px rgba(34, 211, 238, .38);
+  }
+  .cs-tablewrap:hover { transform: translateY(-4px) scale(1.004); }
+
+  /* the button lifts a shorter distance and blooms its halo */
+  .cs-btn:hover, .cs-btn:focus-visible {
+    background: rgba(255, 255, 255, .035);
+    border-color: rgba(139, 92, 246, .55);
+    transform: translateY(-1px);
+  }
+  .cs-btn:hover::after, .cs-btn:focus-visible::after { box-shadow: 0 0 26px 0 rgba(139, 92, 246, .22); }
+  .cs-btn:hover .arrow, .cs-btn:focus-visible .arrow { transform: translateX(3px); }
+
+  /* the icon tiles lift without scaling — a 34px glyph distorts when scaled */
+  .cs-ico:hover, .cs-ico:focus-visible {
+    transform: translateY(-5px);
+    border-color: rgba(139, 92, 246, .55);
+    box-shadow: 0 18px 40px -16px rgba(139, 92, 246, .5);
+  }
+
+  /* The codebase cards are tiles inside an `overflow: hidden` frame, so a lift
+     and an outer glow would be clipped at the frame edge. Same violet/cyan
+     signature, drawn inward instead: ring + wash, no transform. */
+  .cs-gcard:hover {
+    background-color: #101015;
+    box-shadow: inset 0 0 0 1px rgba(139, 92, 246, .55),
+                inset 0 0 60px -18px rgba(139, 92, 246, .55),
+                inset 0 0 90px -30px rgba(34, 211, 238, .45);
+  }
+}
+
+/* ============================================
+   STATIC VARIANT
+   Opt a whole page out of the lift+glow above. For pages whose only
+   intended motion is the background canvas and their own interactive
+   parts — the card hover would compete with those for attention.
+   Must stay after the block it cancels.
+   ============================================ */
+.cs--static .cs-diagram, .cs--static .cs-chartcard, .cs--static .cs-skill,
+.cs--static .cs-tablewrap, .cs--static .cs-gcard { transition: none; }
+@media (hover: hover) and (pointer: fine) {
+  .cs--static .cs-diagram:hover, .cs--static .cs-chartcard:hover,
+  .cs--static .cs-skill:hover, .cs--static .cs-tablewrap:hover,
+  .cs--static .cs-gcard:hover {
+    transform: none;
+    border-color: var(--line);
+    box-shadow: none;
+    background-color: transparent;
+  }
+  .cs--static .cs-gcard:hover { background-color: #0B0B0D; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs .rv { opacity: 1; transform: none; transition: none; }
+  .cs-diagram, .cs-chartcard, .cs-skill, .cs-tablewrap, .cs-gcard,
+  .cs-actcard, .cs-pill, .cs-fig, .cs-btn, .cs-btn .arrow, .cs-ico { transition: none; }
+  .cs-diagram:hover, .cs-chartcard:hover, .cs-skill:hover, .cs-tablewrap:hover,
+  .cs-fig:hover, .cs-btn:hover, .cs-ico:hover { transform: none; }
+  .cs-btn:hover .arrow { transform: none; }
+}

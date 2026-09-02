@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VirtuConnect — Designing a VR Faith Space for Older Adults — Krishang Sharma</title>
+<meta name="description" content="A user-centred design project on social isolation among adults aged 65 and over — taking a culturally familiar virtual environment from pencil storyboard to an evaluated high-fidelity prototype.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../case-study.css">
+</head>
+<body>
+
+<canvas class="plexus" aria-hidden="true"></canvas>
+
+<nav class="nav">
+  <div class="nav__mark">KS<span>.</span>dev</div>
+  <div class="nav__links">
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<!-- cs--ruled: sections divided by an explicit hairline rather than a
+     border between them, per the reference design for this page. -->
+<div class="cs cs--ruled">
+
+<!-- ============ HERO ============ -->
+<header class="cs-wrap">
+  <a class="cs-back" href="../index.html#projects">← Back to projects</a>
+  <div class="cs-hero">
+    <p class="cs-eyebrow">Group coursework · Human–computer interaction</p>
+    <h1>VirtuConnect: a VR faith space for people who don't use VR</h1>
+    <p class="cs-lede">
+      A user-centred design project on social isolation among adults aged 65 and over —
+      taking a culturally familiar virtual environment from pencil storyboard to an
+      evaluated high-fidelity prototype, with every design decision traced back to a
+      requirement.
+    </p>
+
+    <div class="cs-btnrow">
+      <a class="cs-btn" href="../assets/virtuconnect-hci-report.pdf" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5.5L9.5 1Zm0 1.75L12.25 5.5H9.5V2.75ZM5 8h6v1.2H5V8Zm0 2.6h6v1.2H5v-1.2Z"/></svg>
+        Read the full report
+        <span class="arrow">→</span>
+      </a>
+      <span class="cs-repometa">Team of four · Krishang Sharma, Krishna Trivedi, Kavi Naidoo, Jin Xuan Lim</span>
+    </div>
+  </div>
+
+  <div class="cs-band">
+    <div class="cs-pills">
+      <span class="cs-pill">Stakeholder research</span>
+      <span class="cs-pill">Questionnaire design</span>
+      <span class="cs-pill">Storyboarding</span>
+      <span class="cs-pill">Wireframing</span>
+      <span class="cs-pill">High-fidelity prototyping</span>
+      <span class="cs-pill">Heuristic evaluation</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 THE PROBLEM ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">01</span><span class="t">The problem</span><span class="rule"></span></div>
+
+  <div class="cs-stats cs-stats--bar">
+    <div class="cs-stat">
+      <div class="fig">65+</div>
+      <div class="cap">Target users, many with mobility or sensory limitations</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">62.5%</div>
+      <div class="cap">Of respondents rated their comfort with VR at 2 or below out of 5</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">10</div>
+      <div class="cap">Requirements gathered and prioritised before any design work</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">4</div>
+      <div class="cap">Design iterations, from pencil storyboard to evaluated prototype</div>
+    </div>
+  </div>
+
+  <h2>The people who need this most are the least comfortable with the technology.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p class="cs-bodylead">
+        Loneliness among older adults is compounded by the things that cause it. Reduced
+        mobility and chronic health conditions make travel hard, and the places that would
+        offer community — a church, a temple, a mosque — are exactly the places that require
+        travel.
+      </p>
+      <p>
+        The National Institute on Aging links sustained isolation to cognitive decline and
+        depression, and Pew's global data shows religiosity rising with age. Faith spaces are
+        where a large share of this group finds connection, and they're the spaces becoming
+        least reachable.
+      </p>
+    </div>
+    <div>
+      <p>
+        VR removes the travel barrier. It also introduces a new one: a head-mounted display,
+        controllers, and a spatial interface, aimed at a group with the least exposure to any
+        of it. Our own survey confirmed the tension — a clear majority of respondents rated
+        themselves at the bottom of the comfort scale for virtual platforms.
+      </p>
+      <p>
+        That tension defined the project. Every design decision from that point was a trade
+        between what the environment could do and what a first-time user could be asked to
+        learn.
+      </p>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 02 RESEARCH ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">02</span><span class="t">Research</span><span class="rule"></span></div>
+
+  <h2>Three themes from the literature, one questionnaire to test them.</h2>
+  <p>
+    Secondary research set the direction; the questionnaire decided the priorities. Neither
+    alone would have been enough — papers tell you what matters in general, respondents tell
+    you what matters here.
+  </p>
+
+  <div class="cs-stages" style="margin-bottom:52px">
+    <div class="cs-stage">
+      <span class="idx">T1</span>
+      <div>
+        <div class="name">Accessibility and usability</div>
+        <div class="what">Technological exclusion and generational gaps are a documented barrier, and NHS guidance highlights the prevalence of sensory and mobility impairment in this group. Implication: voice-assisted navigation and adaptable visual elements, not just bigger buttons.</div>
+      </div>
+      <span class="cs-tag">→ R1, R2</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">T2</span>
+      <div>
+        <div class="name">Social interaction in virtual environments</div>
+        <div class="what">Work in BMC Geriatrics indicates that immersive, <em>familiar</em> environments mitigate loneliness — familiarity is doing the work, not immersion on its own. Implication: reconstruct real, recognisable spaces rather than invent new ones.</div>
+      </div>
+      <span class="cs-tag">→ R3, R6</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">T3</span>
+      <div>
+        <div class="name">Cultural sensitivity in HCI</div>
+        <div class="what">Pew's age–religiosity correlation makes a generic "social VR lounge" the wrong product for this group. Implication: the environment has to be selectable by faith, and personalisable within it.</div>
+      </div>
+      <span class="cs-tag">→ R3, R7</span>
+    </div>
+  </div>
+
+  <div class="cs-figgrid cs-figgrid--3">
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/vc-preferred-features.png" width="512" height="244" loading="lazy"
+           alt="Bar chart of preferred features: larger text options 100 percent, simple navigation 86.7 percent, voice commands 33.3 percent">
+      <figcaption class="cap"><span class="t">Preferred features</span><span>n=15</span></figcaption>
+    </figure>
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/vc-preferred-activities.png" width="512" height="244" loading="lazy"
+           alt="Bar chart of preferred activities: prayer sessions 92.9 percent, discussion or study groups 78.6 percent, cultural events 50 percent, religious speakers 35.7 percent">
+      <figcaption class="cap"><span class="t">Preferred activities</span><span>n=14</span></figcaption>
+    </figure>
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/vc-vr-comfort.jpg" width="1200" height="570" loading="lazy"
+           alt="Bar chart of comfort with virtual platforms, most responses clustered at the low end of the scale">
+      <figcaption class="cap"><span class="t">Comfort with VR</span><span>n=16</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="cs-two" style="margin-top:44px">
+    <div>
+      <p>
+        <strong>Every respondent</strong> wanted larger text, and 86.7% wanted simple
+        navigation — the two most requested features were both about reducing effort, not
+        adding capability. Voice commands came third at 33.3%, driven by respondents
+        describing conditions that limit dexterity.
+      </p>
+    </div>
+    <div>
+      <p>
+        <strong>Prayer sessions and discussion groups</strong> dominated the activity question
+        at 92.9% and 78.6%. That ranking is why the prototype leads with Scriptures and
+        Prayers as its two primary actions and treats everything else as secondary.
+      </p>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 03 REQUIREMENTS ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">03</span><span class="t">Requirements</span><span class="rule"></span></div>
+
+  <h2>Ten requirements, ranked before anything was drawn.</h2>
+  <p>
+    Consolidated from the literature and the questionnaire, then prioritised. The priority
+    column is what settled arguments later — when two design options conflicted, the
+    higher-priority requirement won rather than the better-argued opinion.
+  </p>
+
+  <table class="cs-tbl">
+    <thead>
+      <tr><th>ID</th><th>Requirement</th><th>Type</th><th class="pri">Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono">R1</td><td>Accessible, user-friendly interface for easy navigation</td><td class="muted">Functional</td><td class="pri hi">HIGH</td></tr>
+      <tr><td class="mono">R2</td><td>Voice command options for those with limited dexterity</td><td class="muted">Functional</td><td class="pri md">MEDIUM</td></tr>
+      <tr><td class="mono">R3</td><td>Choice of religious or cultural environments — temple, mosque, church</td><td class="muted">Functional</td><td class="pri md">MEDIUM</td></tr>
+      <tr><td class="mono">R4</td><td>Scheduling for prayer sessions and group discussions</td><td class="muted">Functional</td><td class="pri lo">LOW</td></tr>
+      <tr><td class="mono">R5</td><td>Privacy controls for users who prefer solitary activity</td><td class="muted">Functional</td><td class="pri lo">LOW</td></tr>
+      <tr><td class="mono">R6</td><td>Interfaith and same-faith gathering options</td><td class="muted">Non-functional</td><td class="pri hi">HIGH</td></tr>
+      <tr><td class="mono">R7</td><td>Personalised space preferences — colours, symbols</td><td class="muted">Functional</td><td class="pri hi">HIGH</td></tr>
+      <tr><td class="mono">R8</td><td>Connection with nearby users for localised gatherings</td><td class="muted">Non-functional</td><td class="pri hi">HIGH</td></tr>
+      <tr><td class="mono">R9</td><td>Feedback mechanism for continuous improvement</td><td class="muted">Functional</td><td class="pri md">MEDIUM</td></tr>
+      <tr><td class="mono">R10</td><td>Data privacy and security meeting ethical and legal guidelines</td><td class="muted">Non-functional</td><td class="pri hi">HIGH</td></tr>
+    </tbody>
+  </table>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 04 LOW FIDELITY ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">04</span><span class="t">Low fidelity</span><span class="rule"></span></div>
+
+  <h2>Pencil first, because pencil is cheap to throw away.</h2>
+
+  <div class="cs-two" style="margin-bottom:44px">
+    <div>
+      <p>
+        The first iteration was a hand-drawn storyboard establishing the journey rather than
+        the interface: a user puts on a headset at home, lands on a welcome screen, selects
+        their faith, chooses a public or private lobby, picks a scripture, and finds themselves
+        in a prayer space with others reading the same text.
+      </p>
+      <p>
+        The wireframe below encodes something the storyboard couldn't. Each frame is drawn
+        <em>curved</em>, because a headset display wraps around the field of view rather than
+        sitting flat — element placement at the edges behaves differently to a monitor.
+      </p>
+    </div>
+    <div>
+      <p>
+        Arrows between frames make every transition explicit, which is how gaps surface early:
+        a screen with no return path is obvious on paper and expensive to discover in a build.
+      </p>
+      <p class="cs-shotnote" style="margin-bottom:14px">
+        Three icons appear on every frame from this stage onward — back, settings, profile.
+        Fixed position, fixed meaning. The fourth was added later.
+      </p>
+      <div class="cs-icons">
+        <div class="cs-ico">
+          <img src="../assets/vc-icon-back.png" width="34" height="34" alt="Back button icon">
+          <span>BACK</span>
+        </div>
+        <div class="cs-ico">
+          <img src="../assets/vc-icon-settings.png" width="34" height="34" alt="Settings gear icon">
+          <span>SETTINGS</span>
+        </div>
+        <div class="cs-ico">
+          <img src="../assets/vc-icon-profile.png" width="34" height="34" alt="Profile icon">
+          <span>PROFILE</span>
+        </div>
+        <div class="cs-ico cs-ico--new">
+          <img src="../assets/vc-icon-home.png" width="34" height="34" alt="Home icon">
+          <span>HOME</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <figure class="cs-fig cs-fig--wide" tabindex="0">
+    <img src="../assets/vc-wireframe.png" width="2600" height="2107" loading="lazy"
+         alt="Wireframe of the full user flow drawn as curved frames connected by arrows, covering welcome, faith selection, activity selection, community choice, friends, scripture selection, prayer and meditation screens">
+    <figcaption class="cap"><span class="t">Wireframe — curved frames, explicit transitions</span><span>the complete flow on one sheet</span></figcaption>
+  </figure>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 05 HIGH FIDELITY ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">05</span><span class="t">High fidelity</span><span class="rule"></span></div>
+
+  <h2>A church you recognise, with two buttons in it.</h2>
+  <p>
+    The first high-fidelity iteration turns the wireframe into a rendered environment: a
+    church interior with pews and ambient light, chosen because familiarity was the mechanism
+    the research identified. Dark backgrounds with sharp contrast reduce visual strain, and
+    the interface holds two primary actions — Scriptures and Prayers — with everything else
+    demoted to persistent corner icons.
+  </p>
+
+  <div class="cs-figstack">
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/vc-prayer-space.jpg" width="1400" height="825" loading="lazy"
+           alt="High-fidelity prayer space showing a church interior with pews, a user avatar, persistent profile and settings icons, and Scriptures and Prayers buttons along the bottom">
+      <figcaption class="cap"><span class="t">Public prayer space — the core screen</span><span>two primary actions, persistent icons</span></figcaption>
+    </figure>
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/vc-screen-map.jpg" width="887" height="810" loading="lazy"
+           alt="Full map of the high-fidelity prototype screens including starting screen, faith selection, spiritual selection, community selection, scripture, meditation space, friends list, prayer selection and private prayer space">
+      <figcaption class="cap"><span class="t">Complete screen map</span><span>every state and its settings overlay</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="cs-two" style="margin-top:44px">
+    <div>
+      <p>
+        Brightness, volume and text-size sliders live behind the settings icon on every
+        screen, satisfying R1, R2 and R8 without putting controls in the user's field of view
+        during a prayer session.
+      </p>
+    </div>
+    <div>
+      <p>
+        Public and private lobbies split from a single Community selection, covering R4, R5
+        and R6 through one decision point rather than a settings menu the user would have to
+        find.
+      </p>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 06 ITERATION ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">06</span><span class="t">Iteration</span><span class="rule"></span></div>
+
+  <h2>The fix that created a new problem, and the guard we added for it.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p>
+        Feedback on the first prototype surfaced a navigation complaint: returning to activity
+        selection meant pressing back repeatedly, which is tedious in a headset and worse when
+        you're several screens deep inside a prayer reading.
+      </p>
+      <p>
+        A home icon solved it in one action. It also introduced a failure mode — in VR, an
+        accidental click has no undo and drops you out of a session you may have been in with
+        other people.
+      </p>
+      <p>
+        So the home icon shipped with a confirmation dialog. That pairing is the part of this
+        project I'd point at: a usability fix evaluated for the new risk it creates rather than
+        declared finished once the original complaint went away.
+      </p>
+    </div>
+    <div>
+      <div class="cs-stages">
+        <div class="cs-stage">
+          <span class="idx">01</span>
+          <div>
+            <div class="name">Observed</div>
+            <div class="what">Repeated back-button presses to reach activity selection, especially from deep states like scripture reading or meditation.</div>
+          </div>
+          <span class="cs-tag">feedback</span>
+        </div>
+        <div class="cs-stage">
+          <span class="idx">02</span>
+          <div>
+            <div class="name">Changed</div>
+            <div class="what">Home icon returning directly to faith selection in a single action. Addresses R2.</div>
+          </div>
+          <span class="cs-tag">added</span>
+        </div>
+        <div class="cs-stage">
+          <span class="idx">03</span>
+          <div>
+            <div class="name">New risk</div>
+            <div class="what">Accidental activation ejects the user from a live shared session with no recovery path.</div>
+          </div>
+          <span class="cs-tag">identified</span>
+        </div>
+        <div class="cs-stage">
+          <span class="idx">04</span>
+          <div>
+            <div class="name">Mitigated</div>
+            <div class="what">Confirmation dialog before exit — one extra step, deliberately traded against the cost of an unrecoverable action.</div>
+          </div>
+          <span class="cs-tag">guarded</span>
+        </div>
+        <div class="cs-stage">
+          <span class="idx">05</span>
+          <div>
+            <div class="name">Also added</div>
+            <div class="what">Speech input for prayer selection. Research on the ageing hand shows hand function declines markedly after 65 — speaking a prayer's name replaces a fine-motor selection task.</div>
+          </div>
+          <span class="cs-tag">R3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 07 EVALUATION ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">07</span><span class="t">Evaluation</span><span class="rule"></span></div>
+
+  <h2>Nielsen's heuristics, rewritten for a headset.</h2>
+  <p>
+    We evaluated against Nielsen Norman's usability heuristics, adapted for an immersive
+    context. The adaptation matters: on a desktop, an accidental click costs a moment; in a
+    headset, the user can't glance away to reorient, so error prevention and system status
+    carry far more weight than the original desktop framing implies.
+  </p>
+
+  <div class="cs-two">
+    <div>
+      <table class="cs-tbl">
+        <thead>
+          <tr><th>Heuristic</th><th>Finding</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Visibility of system status</td><td>Transitions into Prayers lack confirmation — add auditory cues</td></tr>
+          <tr><td>Match with the real world</td><td>Passed — familiar terms and a recognisable church setting</td></tr>
+          <tr><td>User control and freedom</td><td>Sliders have no reset — add "Reset to default"</td></tr>
+          <tr><td>Consistency and standards</td><td>Passed — fixed icon positions across all screens</td></tr>
+          <tr><td>Error prevention</td><td>Confirmation dialog before exiting to the main menu</td></tr>
+          <tr><td>Recognition over recall</td><td>Passed — visible labelled icons throughout</td></tr>
+          <tr><td>Flexibility and efficiency</td><td>Voice commands added without extra visual complexity</td></tr>
+          <tr><td>Error recovery</td><td>No guidance when something fails — add plain-language prompts</td></tr>
+          <tr><td>Help and documentation</td><td>No onboarding — add a short first-run tutorial</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="cs-panel">
+        <h3>Redesign actions taken forward</h3>
+        <p>
+          Auditory confirmation on section transitions. A reset-to-default control for
+          brightness and volume. Plain-language error messages. A brief onboarding tutorial
+          for first-time users.
+        </p>
+        <p>
+          Each traces to a specific heuristic failure rather than a preference, which is the
+          point of using a framework instead of a design review.
+        </p>
+      </div>
+      <div class="cs-panel cs-panel--warn" style="margin-top:24px">
+        <h3>What a heuristic evaluation can't tell you</h3>
+        <p>
+          It's an expert inspection method. It reliably surfaces violations of known
+          principles, and it cannot tell you whether a 70-year-old who has never worn a
+          headset can complete a prayer session unaided. Those are different questions, and we
+          only answered the first.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 08 REFLECTION ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">08</span><span class="t">Reflection</span><span class="rule"></span></div>
+
+  <h2>The evaluation never reached the people it was designed for.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p class="cs-bodylead">
+        Between 14 and 16 people answered the questionnaire, and they were not, for the most
+        part, the 65+ adults the system targets. We designed from research about older adults
+        rather than research with them.
+      </p>
+      <p>
+        That's the honest limitation, and it's the first thing I'd change. Nielsen's own work
+        suggests around five participants surface the majority of usability problems — five
+        older adults in a think-aloud session with the prototype would have been worth more
+        than another twenty survey responses from a convenient sample.
+      </p>
+    </div>
+    <div>
+      <p>
+        <strong>Other open problems.</strong> Voice control assumes reliable recognition, which
+        degrades with strong accents and speech impairments — precisely the users it was
+        introduced to help. Spatial comfort in VR needs testing for sensory overload and
+        motion tolerance, particularly with a group unfamiliar with the medium. And the
+        security model, while specified, was never stress-tested.
+      </p>
+      <p>
+        What the project did teach is the shape of the discipline: gather requirements before
+        designing, prioritise them explicitly, prototype at the cheapest fidelity that can
+        answer the question, and evaluate against a framework rather than an opinion.
+      </p>
+    </div>
+  </div>
+
+  <div class="cs-btnrow" style="margin-top:44px">
+    <a class="cs-btn" href="../assets/virtuconnect-hci-report.pdf" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5.5L9.5 1Zm0 1.75L12.25 5.5H9.5V2.75ZM5 8h6v1.2H5V8Zm0 2.6h6v1.2H5v-1.2Z"/></svg>
+      Read the full report
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</section>
+
+</div>
+
+<footer class="wrap">
+  <div>© 2026 Krishang Sharma</div>
+  <div class="social">
+    <a href="https://www.linkedin.com/in/krishang-sharma1/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:krishangs468@gmail.com">Email</a>
+    <a href="https://github.com/Krrish212" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>

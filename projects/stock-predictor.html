@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSTM Stock Price Predictor with a Flask Front End — Krishang Sharma</title>
+<meta name="description" content="A two-layer LSTM trained on six decades of daily closes, wrapped in a Flask app that takes a ticker, trains or loads a model, renders the diagnostic plots, and returns a next-day close.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../case-study.css">
+</head>
+<body>
+
+<canvas class="plexus" aria-hidden="true"></canvas>
+
+<nav class="nav">
+  <div class="nav__mark">KS<span>.</span>dev</div>
+  <div class="nav__links">
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<!-- cs--ruled: sections divided by an explicit hairline rather than a
+     border between them, per the reference design for this page. -->
+<div class="cs cs--ruled">
+
+<!-- ============ HERO ============ -->
+<header class="cs-wrap">
+  <a class="cs-back" href="../index.html#projects">← Back to projects</a>
+  <div class="cs-hero">
+    <p class="cs-eyebrow">Personal project · Full-stack ML</p>
+    <h1>LSTM Stock Price Predictor with a Flask Front End</h1>
+    <p class="cs-lede">
+      A two-layer LSTM trained on six decades of daily closes, wrapped in a Flask app
+      that takes a ticker, trains or loads a model, renders the diagnostic plots, and
+      returns a next-day close — end to end, in the browser.
+    </p>
+
+    <div class="cs-btnrow">
+      <a class="cs-btn" href="https://github.com/Krrish212/Stock_price_predictor" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        View on GitHub
+        <span class="arrow">→</span>
+      </a>
+      <span class="cs-repometa">Krrish212 / Stock_price_predictor</span>
+    </div>
+  </div>
+
+  <div class="cs-band">
+    <div class="cs-pills">
+      <span class="cs-pill">PyTorch</span>
+      <span class="cs-pill">Flask</span>
+      <span class="cs-pill">Alpha Vantage API</span>
+      <span class="cs-pill">NumPy</span>
+      <span class="cs-pill">Matplotlib</span>
+      <span class="cs-pill">Jinja2</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 OVERVIEW ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">01</span><span class="t">Overview</span><span class="rule"></span></div>
+
+  <div class="cs-stats">
+    <div class="cs-stat">
+      <div class="fig">60 yrs</div>
+      <div class="cap">Of daily adjusted closes pulled per ticker</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">2 × 32</div>
+      <div class="cap">LSTM layers × hidden units, dropout 0.2</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">20 days</div>
+      <div class="cap">Sliding input window per prediction</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">3</div>
+      <div class="cap">Flask routes covering the whole loop, ingest to render</div>
+    </div>
+  </div>
+
+  <h2>A model nobody can query isn't finished.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p class="cs-bodylead">
+        Most forecasting projects stop at a notebook cell containing a validation curve.
+        This one goes the rest of the way: ingest, preprocess, train, serve, and render —
+        reachable by typing a ticker into a search box.
+      </p>
+      <p>
+        Historical daily data is pulled from Alpha Vantage, normalised, cut into overlapping
+        fixed-length windows, and fed to a multi-layer LSTM in PyTorch. Flask serves the model
+        alongside the company summary and the generated plots, with Matplotlib figures written
+        to disk and injected into a Jinja2 template.
+      </p>
+    </div>
+    <div>
+      <p>
+        The deliberate constraint was scope: two layers, 32 hidden units, one input feature.
+        A financial series has a low signal-to-noise ratio and roughly 15,000 usable daily
+        observations, which is not much data for a deep network. A bigger model would fit the
+        training split beautifully and learn nothing transferable.
+      </p>
+      <p>
+        What the project actually demonstrates is the shape of an ML system — configuration
+        separated from logic, preprocessing separated from modelling, inference separated from
+        presentation — rather than a competitive forecast.
+      </p>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 02 DATA PIPELINE ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">02</span><span class="t">Data pipeline</span><span class="rule"></span></div>
+  <h2>Six steps from an API call to a batched tensor.</h2>
+  <p class="cs-secintro">
+    All of this lives in <code>models/utils.py</code>, with every hyperparameter hoisted into a
+    single config dictionary in <code>models/config.py</code> so nothing is tuned by editing logic.
+  </p>
+
+  <div class="cs-stages">
+    <div class="cs-stage">
+      <span class="idx">01</span>
+      <div>
+        <div class="name">Ingest</div>
+        <div class="what">Alpha Vantage daily adjusted endpoint with <code>outputsize: full</code>, taking the adjusted close series so splits and dividends don't appear as artificial price jumps.</div>
+      </div>
+      <span class="cs-tag">utils.py</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">02</span>
+      <div>
+        <div class="name">Normalise</div>
+        <div class="what">A <code>Normalizer</code> class fits mean and standard deviation and stores them, so predictions can be inverse-transformed back to real prices. Statistics are fit once and reused — never recomputed per split.</div>
+      </div>
+      <span class="cs-tag">Normalizer</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">03</span>
+      <div>
+        <div class="name">Window</div>
+        <div class="what">The series is cut into overlapping sequences of 20 trading days, each paired with the following day's close as its target. This is what turns a single time series into thousands of supervised examples.</div>
+      </div>
+      <span class="cs-tag">sliding window</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">04</span>
+      <div>
+        <div class="name">Split chronologically</div>
+        <div class="what">Train and validation are divided by date, not shuffled. Shuffling a time series lets the model interpolate between days it has already seen on both sides — the validation score looks excellent and means nothing.</div>
+      </div>
+      <span class="cs-tag">no shuffle</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">05</span>
+      <div>
+        <div class="name">Batch</div>
+        <div class="what">A <code>TimeSeriesDataset</code> wraps the windows for PyTorch <code>DataLoader</code> consumption at batch size 64.</div>
+      </div>
+      <span class="cs-tag">DataLoader</span>
+    </div>
+    <div class="cs-stage">
+      <span class="idx">06</span>
+      <div>
+        <div class="name">Plot</div>
+        <div class="what">Plot helpers write PNGs to <code>static/plots/</code> during training, which is how diagnostics reach the browser without a JS charting layer.</div>
+      </div>
+      <span class="cs-tag">matplotlib</span>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 03 MODEL ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">03</span><span class="t">Model</span><span class="rule"></span></div>
+  <h2>Small on purpose, regularised on purpose.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p>
+        An LSTM carries a cell state across timesteps with learned input, forget and output
+        gates, which is why it holds information across a 20-step window where a plain RNN's
+        gradients would have vanished.
+      </p>
+      <p>
+        Dropout at 0.2 sits between the recurrent layers. Adam handles optimisation with a
+        scheduled learning-rate decay — starting at 0.01 to move quickly through the early
+        epochs, then decaying so the later ones settle rather than bounce around the minimum.
+      </p>
+      <p>
+        Training and evaluation share a single <code>run_epoch</code> function with a train/eval
+        flag, so the two paths can't silently diverge. <code>predict_next</code> handles
+        single-step inference: take the most recent window, forward pass, inverse-transform
+        back to a price.
+      </p>
+
+      <table class="cs-tbl" style="margin-top:26px">
+        <thead><tr><th>Parameter</th><th class="n">Value</th></tr></thead>
+        <tbody>
+          <tr><td>Input size</td><td class="n">1</td></tr>
+          <tr><td>LSTM layers</td><td class="n">2</td></tr>
+          <tr><td>Hidden units</td><td class="n">32</td></tr>
+          <tr><td>Dropout</td><td class="n">0.2</td></tr>
+          <tr><td>Batch size</td><td class="n">64</td></tr>
+          <tr><td>Epochs</td><td class="n">100</td></tr>
+          <tr><td>Learning rate</td><td class="n">0.01 + decay</td></tr>
+          <tr><td>Optimiser</td><td class="n">Adam</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+<pre class="cs-code"><span class="cm"># models/lstm_model.py — shared train/eval step</span>
+<span class="kw">def</span> <span class="fn">run_epoch</span>(dataloader, is_training=<span class="kw">False</span>):
+    epoch_loss = <span class="fn">0</span>
+    model.train() <span class="kw">if</span> is_training <span class="kw">else</span> model.eval()
+
+    <span class="kw">for</span> x, y <span class="kw">in</span> dataloader:
+        <span class="kw">if</span> is_training:
+            optimizer.zero_grad()
+
+        out  = model(x.to(device))
+        loss = criterion(out.contiguous(), y.to(device))
+
+        <span class="kw">if</span> is_training:
+            loss.backward()
+            optimizer.step()
+
+        epoch_loss += loss.detach().item() / x.shape[<span class="fn">0</span>]
+
+    <span class="kw">return</span> epoch_loss, scheduler.get_last_lr()[<span class="fn">0</span>]</pre>
+
+      <div class="cs-panel" style="margin-top:26px">
+        <h3>Why one feature</h3>
+        <p>
+          The model sees close price only. Volume, volatility and cross-asset signals would all
+          add information, but each extra feature also adds parameters, and with a single asset's
+          history the model overfits before it generalises. Starting univariate keeps the baseline
+          honest — anything added later has to beat it.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 04 DIAGNOSTICS ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">04</span><span class="t">Diagnostics</span><span class="rule"></span></div>
+  <h2>Three plots, and what they do and don't prove.</h2>
+  <p class="cs-secintro">
+    Every training run writes its own diagnostics. They're generated server-side and surfaced in
+    the app rather than living in a notebook.
+  </p>
+
+  <div class="cs-figstack">
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/lstm-train-vs-validation.png" alt="Train versus validation predictions across the full price history, showing the fitted series tracking the broad trend from 1999 to 2025" loading="lazy" width="1400" height="305">
+      <figcaption class="cap"><span class="t">Train vs Validation — full history</span><span>green: train predictions · blue: validation</span></figcaption>
+    </figure>
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/lstm-zoomed-validation.png" alt="Zoomed view of actual versus predicted closes across the validation window, showing day-to-day alignment" loading="lazy" width="1400" height="308">
+      <figcaption class="cap"><span class="t">Zoomed Validation — actual vs predicted</span><span>navy: actual · orange: predicted</span></figcaption>
+    </figure>
+    <figure class="cs-fig" tabindex="0">
+      <img src="../assets/lstm-next-day-prediction.png" alt="Next trading day close predicted against actual, rolled one step ahead across the validation window" loading="lazy" width="1400" height="302">
+      <figcaption class="cap"><span class="t">Next-Day Prediction — one step ahead</span><span>navy: actual · orange: predicted</span></figcaption>
+    </figure>
+  </div>
+  <span class="cs-shotnote">Plots re-rendered for the dark background — the original Matplotlib exports are white-canvas.</span>
+
+  <div class="cs-two" style="margin-top:52px">
+    <div>
+      <p>
+        <strong>Train vs Validation</strong> shows the fitted series against the held-out period,
+        confirming the model tracks the broad trend rather than diverging.
+        <strong>Zoomed Validation</strong> narrows to a few months so the day-to-day alignment is
+        actually visible — at full scale, a decade of prices compresses any error into invisibility.
+      </p>
+      <p>
+        <strong>Next-Day Prediction</strong> is the one the app surfaces to the user, rolling one
+        step ahead across the validation window.
+      </p>
+    </div>
+    <div>
+      <div class="cs-panel cs-panel--warn">
+        <h3>Reading these honestly</h3>
+        <p>
+          A next-day price predictor that visually hugs the actual line is not, by itself, evidence
+          of skill. Yesterday's close is already a strong predictor of today's, so a model that
+          learns to output something close to its last input will produce a chart that looks like
+          this one.
+        </p>
+        <p>
+          The test that separates the two is comparing against a persistence baseline — predict
+          today's close as yesterday's — and measuring directional accuracy rather than RMSE on
+          levels. That comparison is the next thing I'd add, and I'd rather name the gap than let
+          the plot imply more than it shows.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 05 THE APPLICATION ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">05</span><span class="t">The application</span><span class="rule"></span></div>
+  <h2>Three routes cover the entire loop.</h2>
+
+  <div class="cs-two">
+    <div>
+      <table class="cs-tbl">
+        <thead><tr><th>Route</th><th>Does</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">GET /</td><td>Search page with the ticker input</td></tr>
+          <tr><td class="mono">GET /summary/&lt;ticker&gt;</td><td>Trains or loads the model, regenerates plots, renders the template</td></tr>
+          <tr><td class="mono">GET /auto_complete</td><td>Ticker symbol suggestions as you type</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:26px">
+        The summary route is the interesting one, because it carries the whole pipeline behind a
+        single URL: fetch, normalise, window, train or restore <code>lstm_model.pt</code>, predict,
+        plot, render. Company metadata — sector, industry, market cap, P/E — comes back from the
+        same Alpha Vantage account and sits above the prediction so the number has context.
+      </p>
+      <p>
+        Figures reach the page as static PNGs referenced from the Jinja2 template, which keeps the
+        frontend dependency-free at the cost of regenerating images per request.
+      </p>
+    </div>
+
+    <div>
+      <figure class="cs-fig cs-fig--light" tabindex="0">
+        <img src="../assets/lstm-app-summary.jpg" alt="Stock Summary interface showing an Apple Inc search result with sector, industry, market cap, P/E ratio and the next-day predicted close of 232.06" loading="lazy" width="1160" height="814">
+        <figcaption class="cap"><span class="t">GET /summary/AAPL</span><span>live app, Jinja2 template</span></figcaption>
+      </figure>
+      <span class="cs-shotnote">Company metadata and the predicted close render from one request.</span>
+    </div>
+  </div>
+  <div class="cs-rule"></div>
+</section>
+
+<!-- ============ 06 WHAT'S NEXT ============ -->
+<section class="cs-wrap">
+  <div class="cs-sechead"><span class="n">06</span><span class="t">What's next</span><span class="rule"></span></div>
+  <h2>The known gaps, in the order I'd close them.</h2>
+
+  <div class="cs-two">
+    <div>
+      <p>
+        <strong>Baseline comparison first.</strong> Persistence baseline plus directional accuracy,
+        so the model has a number to beat rather than a plot to resemble.
+      </p>
+      <p>
+        <strong>Walk-forward validation.</strong> A single chronological split gives one estimate
+        from one market regime. Rolling the split forward across multiple windows shows whether
+        performance is stable or an artefact of where the cut landed.
+      </p>
+    </div>
+    <div>
+      <p>
+        <strong>Decouple training from serving.</strong> Right now a request can trigger a training
+        run, which is fine for a demo and wrong for anything else. Persisted per-ticker artefacts
+        and a cache would separate the two lifecycles.
+      </p>
+      <p>
+        <strong>More features, carefully.</strong> Volume and realised volatility are the obvious
+        additions — each one earning its place against the univariate baseline rather than being
+        added on principle.
+      </p>
+    </div>
+  </div>
+
+  <div class="cs-btnrow" style="margin-top:44px">
+    <a class="cs-btn" href="https://github.com/Krrish212/Stock_price_predictor" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      Read the code on GitHub
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</section>
+
+</div>
+
+<footer class="wrap">
+  <div>© 2026 Krishang Sharma</div>
+  <div class="social">
+    <a href="https://www.linkedin.com/in/krishang-sharma1/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:krishangs468@gmail.com">Email</a>
+    <a href="https://github.com/Krrish212" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>

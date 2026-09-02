@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill-Conditioned RL for Economically Meaningful Trading — Krishang Sharma</title>
+<meta name="description" content="One PPO agent that learns three distinct trading behaviours — and the finding that behavioural diversity and economic value pull against each other unless you force them together.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../case-study.css">
+</head>
+<body>
+
+<canvas class="plexus" aria-hidden="true"></canvas>
+
+<nav class="nav">
+  <div class="nav__mark">KS<span>.</span>dev</div>
+  <div class="nav__links">
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<div class="cs">
+
+<!-- ============ HERO ============ -->
+<header class="cs-wrap">
+  <a class="cs-back" href="../index.html#projects">← Back to projects</a>
+  <div class="cs-hero">
+    <p class="cs-eyebrow">Third year dissertation · BSc Computer Science &amp; AI</p>
+
+    <div class="cs-herotop">
+      <div>
+        <h1>Skill-Conditioned RL for Economically Meaningful Trading</h1>
+        <p class="cs-lede">
+          One PPO agent that learns three distinct trading behaviours — and the finding
+          that behavioural diversity and economic value pull against each other unless
+          you force them together.
+        </p>
+      </div>
+
+      <div class="cs-actcol">
+        <a class="cs-actcard cs-actcard--v" href="../assets/skill-conditioned-rl-dissertation.pdf" target="_blank" rel="noopener">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4A9FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 4.5h6a3.5 3.5 0 0 1 3.5 3.5v12A3 3 0 0 0 9 17.5H2z"/>
+            <path d="M22 4.5h-6A3.5 3.5 0 0 0 12.5 8v12A3 3 0 0 1 15 17.5h7z"/>
+          </svg>
+          <span>
+            <span class="lab">Read the dissertation</span>
+            <span class="sub">PDF · opens in new tab</span>
+          </span>
+        </a>
+
+        <a class="cs-actcard cs-actcard--c" href="../assets/skill-conditioned-rl-code.zip" download>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7FE6F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3.5v11"/>
+            <path d="M7.5 10.5 12 15l4.5-4.5"/>
+            <path d="M4 19.5h16"/>
+          </svg>
+          <span>
+            <span class="lab">Download the code</span>
+            <span class="sub">ZIP · full training pipeline</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cs-band">
+    <div class="cs-pills">
+      <span class="cs-pill">PPO</span>
+      <span class="cs-pill">DIAYN</span>
+      <span class="cs-pill">PyTorch</span>
+      <span class="cs-pill">Stable-Baselines3</span>
+      <span class="cs-pill">Gymnasium</span>
+      <span class="cs-pill">gym-trading-env</span>
+      <span class="cs-pill">TensorBoard</span>
+      <span class="cs-pill">yfinance</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 OVERVIEW ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">01</span><span class="t">Overview</span><span class="rule"></span></div>
+
+  <div class="cs-stats">
+    <div class="cs-stat">
+      <div class="fig">+23.2%</div>
+      <div class="cap">Best excess return, unseen asset, no retraining</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">−47.5pp</div>
+      <div class="cap">Max drawdown reduction vs. baseline on TSLA</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">3 / 3</div>
+      <div class="cap">Skills still separable with the diversity reward switched off</div>
+    </div>
+    <div class="cs-stat">
+      <div class="fig">14</div>
+      <div class="cap">Training configurations run to isolate the constraint</div>
+    </div>
+  </div>
+
+  <h2>Markets change. A single policy has to average across conditions it should be treating differently.</h2>
+
+  <p>
+    Volatility regimes alternate, correlations restructure, and a strategy that prints money in one
+    period fails in the next. Standard reinforcement learning for trading learns one policy mapping
+    market state to action, so policy improvement is driven by an advantage signal averaged over
+    structurally different conditions. The result is a decision function that is adequate everywhere
+    and optimal nowhere.
+  </p>
+  <p>
+    This project conditions a single PPO agent on a latent skill index, sampled at the start of each
+    episode and held fixed, so one network can carry several behavioural modes. A discriminator is
+    trained to identify the active skill from the states the agent visits, paying the policy an
+    intrinsic reward for being distinguishable. That diversity signal is constrained by an
+    <strong>excess-return</strong> reward — portfolio return minus market return, per step — so that
+    riding a rising market scores approximately zero and only genuine alpha counts.
+  </p>
+  <p>
+    The headline result is a negative one that turned out to be more interesting than the positive one.
+    Diversity and profitability actively compete, and the fix was not a hyperparameter. Every attempt
+    to tune the tension away on a single asset failed. Broadening the training distribution across four
+    equities resolved it in one move.
+  </p>
+</section>
+
+<!-- ============ 02 HOW IT WORKS ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">02</span><span class="t">How it works</span><span class="rule"></span></div>
+
+  <div class="cs-archgrid">
+    <div class="cs-diagram">
+      <svg viewBox="0 0 1180 620" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Architecture: a skill is sampled and fed to a skill-conditioned PPO policy, which acts on the trading environment; the environment's next state trains a discriminator, and the excess return plus weighted diversity bonus form the total reward that updates the policy.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#7A7A8A"/>
+          </marker>
+          <marker id="arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#22D3EE"/>
+          </marker>
+          <marker id="arv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#8B5CF6"/>
+          </marker>
+        </defs>
+
+        <g fill="none" stroke="#7A7A8A" stroke-width="2.2">
+          <path d="M230 105 H322" marker-end="url(#ar)"/>
+          <path d="M610 105 H712" marker-end="url(#ar)"/>
+          <path d="M860 60 V22 H470 V52" marker-end="url(#ar)" stroke="#4E4E5A" stroke-width="1.8"/>
+          <path d="M830 150 V335 H620" marker-end="url(#ar)"/>
+        </g>
+        <path d="M1000 105 H1062 V520 H890" fill="none" stroke="#22D3EE" stroke-width="2.5" opacity=".85" marker-end="url(#arc)"/>
+        <path d="M470 380 V482" fill="none" stroke="#8B5CF6" stroke-width="2.5" opacity=".85" marker-end="url(#arv)"/>
+        <path d="M300 520 H272 V125 H322" fill="none" stroke="#7A7A8A" stroke-width="2.2" marker-end="url(#ar)"/>
+
+        <g stroke-width="2">
+          <rect x="30" y="70" width="200" height="70" rx="9" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.20)"/>
+          <text x="130" y="99" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="500" font-size="19" fill="#F2F2F4">Sample skill</text>
+          <text x="130" y="123" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" fill="#8A8A97">z ~ U{1…K},  K = 3</text>
+
+          <rect x="330" y="60" width="280" height="90" rx="9" fill="rgba(139,92,246,.10)" stroke="rgba(139,92,246,.65)"/>
+          <text x="470" y="97" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="21" fill="#fff">Skill-conditioned PPO</text>
+          <text x="470" y="126" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="17" fill="#C9B2FF">π(a | s, z)</text>
+
+          <rect x="720" y="60" width="280" height="90" rx="9" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.20)"/>
+          <text x="860" y="97" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="21" fill="#fff">Trading environment</text>
+          <text x="860" y="126" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" fill="#8A8A97">long / flat / short · 0.1% cost</text>
+
+          <rect x="330" y="290" width="280" height="90" rx="9" fill="rgba(34,211,238,.09)" stroke="rgba(34,211,238,.58)"/>
+          <text x="470" y="327" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="21" fill="#fff">Discriminator</text>
+          <text x="470" y="356" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="17" fill="#8FEAF9">q(z | s′)</text>
+
+          <rect x="300" y="490" width="580" height="60" rx="9" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.24)"/>
+          <text x="590" y="527" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="19" fill="#F2F2F4">
+            <tspan>r</tspan><tspan font-size="14" dy="5">total</tspan><tspan dy="-5">  =  </tspan><tspan fill="#22D3EE">r</tspan><tspan fill="#22D3EE" font-size="14" dy="5">excess</tspan><tspan dy="-5">  +  </tspan><tspan fill="#C9B2FF">λ</tspan><tspan> · </tspan><tspan fill="#8B5CF6">r</tspan><tspan fill="#8B5CF6" font-size="14" dy="5">div</tspan>
+          </text>
+        </g>
+
+        <g font-family="JetBrains Mono, monospace" font-size="16" fill="#8A8A97">
+          <text x="276" y="95" text-anchor="middle">z</text>
+          <text x="661" y="95" text-anchor="middle">a</text>
+          <text x="665" y="16" text-anchor="middle" fill="#6A6A78">s′  state feedback</text>
+          <text x="818" y="258" text-anchor="end">s′</text>
+          <text x="1076" y="330" fill="#22D3EE">excess return</text>
+          <text x="488" y="444" fill="#A98BFF">diversity bonus</text>
+          <text x="262" y="330" text-anchor="end" fill="#8A8A97">PPO update</text>
+        </g>
+      </svg>
+    </div>
+
+    <div>
+      <div class="cs-eq">
+        r<sub>total</sub> = <span class="ex">r<sub>excess</sub></span> + <span class="lam">λ</span> · <span class="dv">r<sub>div</sub></span>
+      </div>
+      <ul class="cs-notes">
+        <li>
+          <b>Skill conditioning</b>
+          <span>A one-hot skill index is appended to the seven-feature market observation, sampled per episode and held fixed. One network, three behavioural modes, no architectural change to PPO.</span>
+        </li>
+        <li>
+          <b>Diversity reward</b>
+          <span>The discriminator's log-confidence that it can identify the active skill from the resulting state — normalised to [0, 1] so it cannot swamp the profit term, which it does at raw scale.</span>
+        </li>
+        <li>
+          <b>Excess return</b>
+          <span>Portfolio change minus market change, per step. Buy-and-hold scores roughly zero, so the agent cannot be paid for market drift it did nothing to earn.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 EXPERIMENTAL PROGRESSION ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">03</span><span class="t">Experimental progression</span><span class="rule"></span></div>
+  <h2>Nine configurations, each one motivated by how the last one failed.</h2>
+
+  <div class="cs-tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Configuration</th>
+          <th class="n">Disc. acc.</th>
+          <th class="n">Eval reward</th>
+          <th class="n">Trades / ep</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="idx">01</td><td class="cfg">Baseline PPO, raw reward</td><td class="n">—</td><td class="n good">+0.20</td><td class="n">40–90</td><td>Pipeline works, but rewards market drift</td></tr>
+        <tr><td class="idx">02</td><td class="cfg">Skill conditioning, λ = 0</td><td class="n bad">0.16</td><td class="n">+0.20</td><td class="n">—</td><td>Below chance. Unpaid diversity is ignored</td></tr>
+        <tr><td class="idx">03</td><td class="cfg">λ = 0.1, raw diversity</td><td class="n">0.99</td><td class="n bad">−0.16</td><td class="n">0–1</td><td>Perfectly separable, does nothing</td></tr>
+        <tr><td class="idx">04</td><td class="cfg">λ = 0.05</td><td class="n">0.85</td><td class="n bad">−0.59</td><td class="n">~245</td><td>Churns straight through transaction costs</td></tr>
+        <tr><td class="idx">05</td><td class="cfg">λ = 0.01</td><td class="n">0.89</td><td class="n good">+0.10</td><td class="n">40–110</td><td>Only stable window in the sweep</td></tr>
+        <tr><td class="idx">06</td><td class="cfg">Excess return, λ = 0.01</td><td class="n">0.95</td><td class="n bad">−0.32</td><td class="n">—</td><td>Honest reward, and the skills collapse</td></tr>
+        <tr><td class="idx">07</td><td class="cfg">+ λ annealing, 100k warmup</td><td class="n">0.53</td><td class="n bad">−0.21</td><td class="n">—</td><td>Sequencing the objectives doesn't help</td></tr>
+        <tr><td class="idx">08</td><td class="cfg">+ 1M steps, 30 years of data</td><td class="n">0.81</td><td class="n bad">−0.40</td><td class="n">—</td><td>Nor does scale</td></tr>
+        <tr class="win"><td class="idx">09</td><td class="cfg">Multi-asset, annealed</td><td class="n">0.899</td><td class="n">−0.184</td><td class="n">—</td><td>Three skills survive and transfer</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cs-tnote">
+    Rows 01–08 train on AAPL alone. Row 09 samples per episode across AAPL, GOOG, TSLA and NVDA.<br>
+    Random-baseline discriminator accuracy is 0.333. Eval reward is measured on a held-out validation split.
+  </p>
+</section>
+
+<!-- ============ 04 WHAT THE TABLE SHOWS ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">04</span><span class="t">What the table shows</span><span class="rule"></span></div>
+
+  <div class="cs-findgrid">
+    <div>
+      <p class="cs-pull">0.99 discriminator accuracy. One trade per episode. The agent had learned that the cheapest way to be identifiable is to do nothing.</p>
+
+      <p>
+        Read the accuracy column against the eval column and they do not track each other. Row 03 has the
+        highest accuracy on the page and one of the worst returns — three skills, each pinned to a
+        permanent position, generating tightly clustered trajectories that are trivial to classify at zero
+        trading cost. Row 08 scores 0.81 and still performs worse than row 06 at 0.95. <strong>Separability
+        in state space is not economic validity</strong>, which means discriminator accuracy cannot be used
+        alone as a measure of skill quality. Skills need to be judged jointly on discriminability,
+        trading behaviour, and out-of-sample return.
+      </p>
+      <p>
+        Rows 06 to 08 are the real result. Once the reward is honest, every single-asset intervention fails —
+        λ magnitude, annealing schedule, warmup length, twice the training steps, thirty years of history.
+        Row 09 changes only the training distribution and the collapse resolves at around 250k steps.
+        The binding constraint was <strong>distributional, not parametric</strong>: one asset under an
+        excess-return objective supports roughly one reliably profitable strategy, and three skills cannot
+        be carved out of one.
+      </p>
+    </div>
+
+    <div class="cs-chartcard">
+      <h3>Drawdown under the defensive skill</h3>
+      <div class="sub">Maximum drawdown, held-out test periods</div>
+      <svg viewBox="0 0 380 250" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Paired bar chart of maximum drawdown, baseline versus Skill 1: AAPL 23.0 to 3.1 percent, GOOG 17.9 to 0.3, TSLA 47.6 to 0.1, NVDA 42.0 to 0.1.">
+        <g stroke="rgba(255,255,255,.07)" stroke-width="1">
+          <line x1="42" y1="200" x2="370" y2="200"/>
+          <line x1="42" y1="150" x2="370" y2="150"/>
+          <line x1="42" y1="100" x2="370" y2="100"/>
+          <line x1="42" y1="50"  x2="370" y2="50"/>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="9.5" fill="#55555E" text-anchor="end">
+          <text x="34" y="204">0</text><text x="34" y="154">20</text>
+          <text x="34" y="104">40</text><text x="34" y="54">60</text>
+        </g>
+        <!-- 2.5px per % ; baseline violet-grey, skill cyan -->
+        <g>
+          <rect x="56"  y="142.5" width="26" height="57.5" fill="#3E3E48" rx="2"/>
+          <rect x="86"  y="192.3" width="26" height="7.7"  fill="#22D3EE" rx="2"/>
+          <rect x="138" y="155.3" width="26" height="44.7" fill="#3E3E48" rx="2"/>
+          <rect x="168" y="199.3" width="26" height="0.7"  fill="#22D3EE" rx="2"/>
+          <rect x="220" y="81"    width="26" height="119"  fill="#3E3E48" rx="2"/>
+          <rect x="250" y="199.7" width="26" height="0.3"  fill="#22D3EE" rx="2"/>
+          <rect x="302" y="95"    width="26" height="105"  fill="#3E3E48" rx="2"/>
+          <rect x="332" y="199.7" width="26" height="0.3"  fill="#22D3EE" rx="2"/>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="#7A7A85" text-anchor="middle">
+          <text x="84"  y="220">AAPL</text>
+          <text x="166" y="220">GOOG</text>
+          <text x="248" y="220">TSLA</text>
+          <text x="330" y="220">NVDA</text>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="9" fill="#22D3EE" text-anchor="middle">
+          <text x="99"  y="186">3.1</text>
+          <text x="181" y="193">0.3</text>
+          <text x="263" y="193">0.1</text>
+          <text x="345" y="193">0.1</text>
+        </g>
+      </svg>
+      <div class="cs-legend">
+        <span><i style="background:#3E3E48"></i>Baseline</span>
+        <span><i style="background:#22D3EE"></i>Skill 1</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 THE THREE SKILLS ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">05</span><span class="t">The three skills</span><span class="rule"></span></div>
+  <h2>What multi-asset training actually produced.</h2>
+  <p style="margin-bottom:44px">
+    Evaluated on held-out AAPL data with the diversity reward set to zero. All three remain
+    79–99% discriminable, so the separation is encoded in the policy rather than propped up by the reward.
+  </p>
+
+  <div class="cs-skills">
+    <article class="cs-skill">
+      <div class="tag">Skill 0</div>
+      <h3>Return generator</h3>
+      <div class="cs-bias"><i class="l" style="width:96.7%"></i><i class="f" style="width:0.1%"></i><i class="s" style="width:3.2%"></i></div>
+      <div class="cs-biaslab">96.7% long · 0.1% flat · 3.2% short</div>
+      <dl style="margin:0">
+        <div class="cs-kv"><dt>Portfolio return</dt><dd class="good">+29.6%</dd></div>
+        <div class="cs-kv"><dt>Excess return</dt><dd class="good">+1.7%</dd></div>
+        <div class="cs-kv"><dt>Sharpe</dt><dd>0.9</dd></div>
+        <div class="cs-kv"><dt>Trades / ep</dt><dd>16.7</dd></div>
+      </dl>
+      <p class="note">Holds profitable positions rather than reacting to noise. Against a multi-asset baseline of −0.9%, this is the first positive excess return in the whole experimental series.</p>
+    </article>
+
+    <article class="cs-skill">
+      <div class="tag">Skill 1</div>
+      <h3>Capital preservation</h3>
+      <div class="cs-bias"><i class="l" style="width:0.1%"></i><i class="f" style="width:98.6%"></i><i class="s" style="width:1.3%"></i></div>
+      <div class="cs-biaslab">0.1% long · 98.6% flat · 1.3% short</div>
+      <dl style="margin:0">
+        <div class="cs-kv"><dt>Max drawdown</dt><dd class="good">3.1%</dd></div>
+        <div class="cs-kv"><dt>Baseline drawdown</dt><dd>23.0%</dd></div>
+        <div class="cs-kv"><dt>Variance</dt><dd>±1.7%</dd></div>
+        <div class="cs-kv"><dt>Trades / ep</dt><dd>9.2</dd></div>
+      </dl>
+      <p class="note">Staying flat is the cheapest way to look different from Skill 0 while dodging transaction costs — and it happens to be a real defensive strategy. Incentive and economics align here.</p>
+    </article>
+
+    <article class="cs-skill">
+      <div class="tag">Skill 2</div>
+      <h3>Short-side specialist</h3>
+      <div class="cs-bias"><i class="l" style="width:19.5%"></i><i class="f" style="width:0.1%"></i><i class="s" style="width:80.4%"></i></div>
+      <div class="cs-biaslab">19.5% long · 0.1% flat · 80.4% short</div>
+      <dl style="margin:0">
+        <div class="cs-kv"><dt>Excess return</dt><dd class="bad">−52.5%</dd></div>
+        <div class="cs-kv"><dt>Max drawdown</dt><dd>35.3%</dd></div>
+        <div class="cs-kv"><dt>Disc. accuracy</dt><dd>79.9%</dd></div>
+        <div class="cs-kv"><dt>Trades / ep</dt><dd>136.2</dd></div>
+      </dl>
+      <p class="note">Every test window in this study is a bull market, which structurally disadvantages a short bias. The behavioural identity is stable and coherent; its economic value is untested rather than disproved.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ 06 TRANSFER TO UNSEEN ASSETS ============ -->
+<section class="cs-wrap rv">
+  <div class="cs-sechead"><span class="n">06</span><span class="t">Transfer to unseen assets</span><span class="rule"></span></div>
+  <h2>Weights frozen. No retraining. Three assets the skills had to hold up on.</h2>
+
+  <div class="cs-charts">
+    <div class="cs-chartcard">
+      <h3>Skill 0 vs. baseline portfolio return</h3>
+      <div class="sub">Percentage points of outperformance</div>
+      <svg viewBox="0 0 420 250" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Diverging bar chart of Skill 0 outperformance in percentage points: AAPL plus 30.5, GOOG plus 46.6, TSLA minus 13.2, NVDA plus 59.9.">
+        <g stroke="rgba(255,255,255,.07)" stroke-width="1">
+          <line x1="46" y1="35" x2="410" y2="35"/>
+          <line x1="46" y1="95" x2="410" y2="95"/>
+        </g>
+        <line x1="46" y1="155" x2="410" y2="155" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+        <g font-family="JetBrains Mono, monospace" font-size="9.5" fill="#55555E" text-anchor="end">
+          <text x="38" y="39">+60</text><text x="38" y="99">+30</text><text x="38" y="159">0</text><text x="38" y="219">−30</text>
+        </g>
+        <!-- 2px per pp, zero at y=155 -->
+        <g>
+          <rect x="66"  y="94"  width="52" height="61"   fill="#22D3EE" rx="2" opacity=".9"/>
+          <rect x="156" y="61.8" width="52" height="93.2" fill="#22D3EE" rx="2" opacity=".9"/>
+          <rect x="246" y="155" width="52" height="26.4" fill="#E2708A" rx="2" opacity=".9"/>
+          <rect x="336" y="35.2" width="52" height="119.8" fill="#22D3EE" rx="2" opacity=".9"/>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="#D0D0D8" text-anchor="middle">
+          <text x="92"  y="86">+30.5</text>
+          <text x="182" y="54">+46.6</text>
+          <text x="272" y="196" fill="#E2708A">−13.2</text>
+          <text x="362" y="27">+59.9</text>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="#7A7A85" text-anchor="middle">
+          <text x="92"  y="235">AAPL</text>
+          <text x="182" y="235">GOOG</text>
+          <text x="272" y="235">TSLA</text>
+          <text x="362" y="235">NVDA</text>
+        </g>
+      </svg>
+      <p class="note cs-chartnote">
+        Beats the baseline on three of four assets, but clears the market benchmark on only two
+        (+1.7% AAPL, +23.2% GOOG). TSLA's high-volatility momentum is where a moderate-frequency
+        long bias breaks down.
+      </p>
+    </div>
+
+    <div class="cs-chartcard">
+      <h3>Discriminator accuracy off-distribution</h3>
+      <div class="sub">Per skill, per asset, with λ = 0</div>
+      <svg viewBox="0 0 420 250" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Grouped bar chart of discriminator accuracy per skill per asset, all between 75 and 99.7 percent, well above the 33.3 percent random baseline.">
+        <g stroke="rgba(255,255,255,.07)" stroke-width="1">
+          <line x1="46" y1="30" x2="410" y2="30"/>
+          <line x1="46" y1="90" x2="410" y2="90"/>
+          <line x1="46" y1="150" x2="410" y2="150"/>
+        </g>
+        <line x1="46" y1="190" x2="410" y2="190" stroke="#E2708A" stroke-width="1" stroke-dasharray="3 4" opacity=".6"/>
+        <line x1="46" y1="210" x2="410" y2="210" stroke="rgba(255,255,255,.14)"/>
+        <g font-family="JetBrains Mono, monospace" font-size="9.5" fill="#55555E" text-anchor="end">
+          <text x="38" y="34">100</text><text x="38" y="94">80</text><text x="38" y="154">60</text>
+        </g>
+        <text x="52" y="185" font-family="JetBrains Mono, monospace" font-size="9" fill="#E2708A" opacity=".8">random 33.3</text>
+        <!-- zero at 210, 3px per % -->
+        <g>
+          <rect x="62"  y="23.5" width="16" height="186.5" fill="#22D3EE" rx="2" opacity=".85"/>
+          <rect x="82"  y="13"   width="16" height="197"   fill="#8B5CF6" rx="2" opacity=".85"/>
+          <rect x="102" y="30.3" width="16" height="179.7" fill="#4B4B55" rx="2"/>
+          <rect x="152" y="15.4" width="16" height="194.6" fill="#22D3EE" rx="2" opacity=".85"/>
+          <rect x="172" y="11.1" width="16" height="198.9" fill="#8B5CF6" rx="2" opacity=".85"/>
+          <rect x="192" y="35"   width="16" height="175"   fill="#4B4B55" rx="2"/>
+          <rect x="242" y="34"   width="16" height="176"   fill="#22D3EE" rx="2" opacity=".85"/>
+          <rect x="262" y="19.9" width="16" height="190.1" fill="#8B5CF6" rx="2" opacity=".85"/>
+          <rect x="282" y="25.2" width="16" height="184.8" fill="#4B4B55" rx="2"/>
+          <rect x="332" y="37.3" width="16" height="172.7" fill="#22D3EE" rx="2" opacity=".85"/>
+          <rect x="352" y="13"   width="16" height="197"   fill="#8B5CF6" rx="2" opacity=".85"/>
+          <rect x="372" y="23.4" width="16" height="186.6" fill="#4B4B55" rx="2"/>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="10" fill="#7A7A85" text-anchor="middle">
+          <text x="90"  y="232">AAPL</text>
+          <text x="180" y="232">GOOG</text>
+          <text x="270" y="232">TSLA</text>
+          <text x="360" y="232">NVDA</text>
+        </g>
+      </svg>
+      <div class="cs-legend">
+        <span><i style="background:#22D3EE"></i>Skill 0</span>
+        <span><i style="background:#8B5CF6"></i>Skill 1</span>
+        <span><i style="background:#4B4B55"></i>Skill 2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer class="wrap">
+  <div>© 2026 Krishang Sharma</div>
+  <div class="social">
+    <a href="../assets/skill-conditioned-rl-dissertation.pdf" target="_blank" rel="noopener">Dissertation PDF</a>
+    <a href="https://github.com/Krrish212" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/krishang-sharma1/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:krishangs468@gmail.com">Email</a>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+<script src="../case-study.js"></script>
+</body>
+</html>

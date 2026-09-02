@@ -1,0 +1,1946 @@
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+:root {
+  /* Core palette */
+  --bg: #08080b;
+  --bg-alt: #0d0d12;
+  --surface: #131319;
+  --surface-2: #191922;
+  --border: #23232e;
+  --text: #f2f2f5;
+  --text-dim: #9a9aa8;
+  --text-faint: #5c5c6b;
+
+  /* Signature accents */
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0, 229, 255, 0.35);
+  --violet: #a855f7;
+  --violet-dim: rgba(168, 85, 247, 0.35);
+  /* completing the accent set the case studies already use, same hexes, so the
+     skills bento can give each category its own identity without inventing hues */
+  --emerald: #34d399;
+  --amber: #fbbf24;
+  /* two more so all six project cards can hold a distinct hue; rose matches the
+     case-study sheet, blue sits far enough from --cyan to not read as a repeat */
+  --rose: #e2708a;
+  --blue: #60a5fa;
+
+  /* Company accents (experience cards only) */
+  --accenture-a: #7c3aed;
+  --accenture-b: #0a0a0f;
+  --barclays-a: #00aeef;
+  --barclays-b: #001e3c;
+  --dojo-a: #00e0b8;
+  --dojo-b: #05100e;
+
+  /* Type */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Motion — was declared on .exp-rail; promoted here so the skills bento can
+     reuse the same curve and timing rather than inventing its own */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 320ms;
+
+  /* Rhythm */
+  --section-pad: clamp(4rem, 9vw, 8rem);
+  --max-w: 1240px;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--violet);
+  color: #08080b;
+}
+
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+}
+
+/* Animated plexus network background, fixed behind content */
+.plexus {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* ============================================
+   NAV
+   ============================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem clamp(1.25rem, 5vw, 3rem);
+  background: rgba(8, 8, 11, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav__mark {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.nav__mark span { color: var(--cyan); }
+
+.nav__links {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2.25rem);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+.nav__links a { transition: color 0.2s ease; position: relative; }
+.nav__links a:hover { color: var(--cyan); }
+.nav__links a.active { color: var(--text); }
+
+/* ============================================
+   HERO — persistent text (left) · reveal stage (right)
+   ============================================ */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 7rem;
+  padding-bottom: 4rem;
+  overflow: hidden; /* clips the exiting frames so they never widen the page */
+}
+
+/* Pinned scrub (desktop, no reduced-motion): the wrapper is
+   100vh + 130vh of scrub distance; the hero stays sticky while
+   scroll progress 0→1 drives the split. */
+.hero-pin--active { height: 230vh; }
+.hero-pin--active .hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 0;
+}
+.hero-pin--active .hero__wheelwrap {
+  animation: none;
+  opacity: 0.25;
+  transform: scale(0.92);
+}
+
+/* Reduced-motion: static hero — no pin, no photos, wheel fully visible */
+.hero--static .hero__frame { display: none; }
+.hero--static .hero__wheelwrap { animation: none; opacity: 1; }
+
+/* <1024px: no pin — one-time reveal when the stage enters view */
+.hero--mobile .hero__frame {
+  transition: transform 0.9s cubic-bezier(.2,.8,.2,1), opacity 0.9s ease;
+}
+.hero--mobile .hero__wheelwrap {
+  animation: none;
+  opacity: 0.25;
+  transform: scale(0.94);
+  transition: opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s;
+}
+.hero--mobile.is-revealed .hero__frame--1 { transform: translate(-75%, -65%) rotate(-16deg); opacity: 0; }
+.hero--mobile.is-revealed .hero__frame--2 { transform: translate(75%, 65%) rotate(15deg); opacity: 0; }
+.hero--mobile.is-revealed .hero__wheelwrap { opacity: 1; transform: scale(1); }
+
+.hero__grid {
+  display: grid;
+  /* The centre takes the largest share because it carries the portrait stack:
+     the frames are 86.17% of it and the leftover 13.83% *is* their diagonal
+     offset, so column width and card overlap scale together. Left is sized to
+     hold the eyebrow on one line down to 1280. */
+  grid-template-columns: minmax(0, 31.4fr) minmax(0, 44.1fr) minmax(0, 24.5fr);
+  gap: clamp(2.25rem, 6.3vw, 6.375rem);
+  align-items: center;
+  width: 100%;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  /* fluid so it keeps shedding width as the left column narrows — at a fixed
+     size it is the one line that decides whether the zone wraps */
+  font-size: clamp(0.92rem, 1.15vw, 1.04rem);
+  color: var(--cyan);
+  /* 0.04em, not 0.08em: the larger size spends the tracking budget instead */
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 1.45rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  /* dominant visual anchor; the left column is widened to 31fr to hold it */
+  font-size: clamp(2.05rem, 3.05vw, 2.95rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.35rem;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.15s forwards;
+}
+
+.hero__title .grad {
+  background: linear-gradient(100deg, var(--cyan), var(--violet) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero__intro {
+  font-size: 1.12rem;
+  line-height: 1.72;
+  color: var(--text-dim);
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero__sub {
+  font-family: var(--font-mono);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.45s forwards;
+}
+
+/* --- Reveal stage (right zone) --- */
+.hero__stage {
+  position: relative;
+  /* Height tracks width instead of the viewport. The frames sit flush to the
+     stage corners, so the stage's proportions *are* their vertical overlap:
+     at 1/1.38 the pair always overlaps by ~72% of a card, where a vh-driven
+     height swung it from 85% on a short window to 25% on a tall one — and the
+     thin end let the outer wheel icons clear the cards. */
+  aspect-ratio: 1 / 1.38;
+  height: auto;
+  /* 56.5vh is 78vh / 1.38: the width a short window can afford at that ratio.
+     Capping the width rather than the height keeps the proportions — clamping
+     the height instead squashes the stage and collapses the two frames onto
+     each other. justify-self keeps the narrowed stage centred in its column. */
+  width: min(100%, 56.5vh, 565px);
+  justify-self: center;
+}
+
+.img-missing img { display: none; }
+
+/* two overlapping "polaroid" portrait frames */
+.hero__frame {
+  /* The stage is the ruler: at 86.17% each frame leaves 13.83% of the stage as
+     the horizontal offset to the other one, so growing the centre column grows
+     the cards and their overlap by the same factor. No viewport-height guard is
+     needed here: the stage's own 56.5vh width cap pulls it in on a short
+     window, so the frames shrink with it. */
+  position: absolute;
+  width: 86.17%;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  will-change: transform;
+}
+/* flush to the stage corners: the taller frames need every pixel of stage
+   height for the vertical offset, and the 2% inset spent 4% of it */
+.hero__frame--1 { top: 0; left: 0; transform: rotate(-6deg); z-index: 3; }
+.hero__frame--2 { bottom: 0; right: 0; transform: rotate(5deg); z-index: 4; }
+
+.hero__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__frame-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.hero__photo-mono {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.hero__photo-mono span { color: var(--cyan); }
+.hero__photo-note {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+/* --- Tool wheel (in the stage, behind the frames) --- */
+.hero__wheelwrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.35s forwards;
+  will-change: opacity, transform;
+}
+/* soft colour pop behind the wheel */
+.hero__wheelwrap::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(120%, calc(100vw - 1rem));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(168, 85, 247, 0.16),
+    rgba(0, 229, 255, 0.07) 45%,
+    transparent 70%);
+  pointer-events: none;
+}
+
+.wheel {
+  /* +30%, matching the frames: script.js derives the orbit radius from this box
+     minus a tile, so widening the box scales radius and icons together */
+  --tile: clamp(64px, 7.9vw, 104px);
+  position: relative;
+  width: min(100%, 559px);
+  /* the orbit is squashed to SQUASH=0.38 and leaned -12deg, so the box
+     hugs the ellipse's real extent instead of reserving a full square */
+  aspect-ratio: 1 / 0.58;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wheel:active { cursor: grabbing; }
+
+/* the orbit plane: leaned diagonally so the ellipse isn't axis-aligned.
+   Tiles counter-rotate by +12deg in JS to stay upright. */
+.wheel__ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-12deg); /* must match SKEW in script.js */
+}
+
+/* position/scale/opacity/zIndex are all driven per-frame from script.js */
+.wheel__item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tile);
+  height: var(--tile);
+  will-change: transform, opacity;
+}
+
+.wheel__tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  transition: border-color 0.2s ease;
+  will-change: transform;
+}
+/* subtle whitening overlay on hover/focus */
+.wheel__tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(232, 232, 237, 0.12);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.wheel__item:hover .wheel__tile,
+.wheel__tile:focus-visible { border-color: var(--brand, var(--cyan)); }
+.wheel__item:hover .wheel__tile::before,
+.wheel__tile:focus-visible::before { opacity: 1; }
+
+.wheel__tile svg {
+  width: 50%;
+  height: 50%;
+  color: var(--brand, var(--text-dim));
+}
+
+/* flat hover label — positioned by JS in the stage layer,
+   outside the tilted plane, so it is never distorted */
+.wheel__label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  transform: translate(-50%, 0);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--text);
+  background: rgba(19, 19, 25, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.8rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.wheel__label.on { opacity: 1; }
+
+/* title above the wheel, centred over it (centre of the wheel is empty) */
+.wheel-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.42vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em; /* optically recentres letter-spaced caps */
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.wheel-title::after {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin: 0.55rem auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+}
+
+/* --- Contact panel (right column) --- */
+.hero-contact {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  padding: 1.8rem 1.7rem;
+  box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.6s forwards;
+}
+.hero-contact__title {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  padding-bottom: 1rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+.hero-contact__links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.62rem;
+}
+.hero-contact__link {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 0.5rem;
+  margin: -0.5rem -0.5rem 0;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 1.06rem;
+  color: var(--text);
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hero-contact__link:hover {
+  color: var(--row, var(--cyan));
+  border-color: var(--row, var(--cyan));
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -10px var(--row-glow, var(--cyan-dim));
+}
+
+/* brand-coloured badge holding each glyph */
+.hero-contact__badge {
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  border-radius: 11px;
+  background: var(--row, var(--surface-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: box-shadow 0.2s ease;
+}
+.hero-contact__link:hover .hero-contact__badge {
+  box-shadow: 0 0 0 1px var(--row, var(--cyan)), 0 6px 18px -6px var(--row-glow, var(--cyan-dim));
+}
+.hero-contact__badge svg { width: 21.5px; height: 21.5px; }
+/* multicolour email badge (generic mail mark, not a specific brand logo) */
+.hero-contact__badge--mail {
+  background: linear-gradient(135deg, #EA4335 0%, #FBBC04 35%, #34A853 68%, #4285F4 100%);
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 2rem;
+  left: clamp(1.25rem, 5vw, 3rem);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.7s forwards;
+}
+.hero__scroll::after {
+  content: '';
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(var(--cyan), transparent);
+  animation: scrollLine 1.8s ease-in-out infinite;
+}
+@keyframes scrollLine {
+  0% { transform: scaleY(0); transform-origin: top; opacity: 0.2; }
+  50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  51% { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0.2; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   STAT STRIP
+   ============================================ */
+.stats {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: rgba(8, 8, 11, 0.5);
+}
+.stats__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.stat {
+  padding: 1.75rem clamp(1.25rem, 5vw, 3rem);
+  border-right: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.stat:last-child { border-right: none; }
+.stat__num {
+  font-size: 1.4rem;
+  color: var(--cyan);
+  font-weight: 600;
+}
+.stat__label {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin-top: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+.section {
+  position: relative;
+  z-index: 1;
+  padding: var(--section-pad) 0;
+}
+.section__head {
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+  margin-bottom: 3rem;
+}
+.section__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--violet);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+.section__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  max-width: 20ch;
+}
+.section__desc {
+  margin-top: 0.9rem;
+  color: var(--text-dim);
+  max-width: 56ch;
+  font-size: 0.98rem;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+
+/* ============================================
+   SHARED ACCENTS + TAGS
+   ============================================ */
+.accent-accenture { --card-accent: var(--accenture-a); --card-accent-glow: rgba(124, 58, 237, 0.35); }
+.accent-barclays  { --card-accent: var(--barclays-a);  --card-accent-glow: rgba(0, 174, 239, 0.32); }
+.accent-dojo      { --card-accent: var(--dojo-a);      --card-accent-glow: rgba(0, 224, 184, 0.30); }
+/* One hue per project card. --ink is the darkened version used once the card
+   flips to its light veil on hover, so each needs enough contrast on #eef0f4.
+   --base is the card's resting background, the hue mixed down into obsidian. */
+.accent-violet  { --card-accent: var(--violet);  --card-accent-glow: var(--violet-dim);      --card-accent-ink: #7c3aed; --card-accent-base: #12101c; }
+.accent-cyan    { --card-accent: var(--cyan);    --card-accent-glow: var(--cyan-dim);        --card-accent-ink: #0e7490; --card-accent-base: #0a1418; }
+.accent-amber   { --card-accent: var(--amber);   --card-accent-glow: rgba(251,191,36,0.35);  --card-accent-ink: #a16207; --card-accent-base: #16120a; }
+.accent-blue    { --card-accent: var(--blue);    --card-accent-glow: rgba(96,165,250,0.35);  --card-accent-ink: #1d4ed8; --card-accent-base: #0b1019; }
+.accent-rose    { --card-accent: var(--rose);    --card-accent-glow: rgba(226,112,138,0.35); --card-accent-ink: #be123c; --card-accent-base: #180f13; }
+.accent-emerald { --card-accent: var(--emerald); --card-accent-glow: rgba(52,211,153,0.35);  --card-accent-ink: #047857; --card-accent-base: #0a1613; }
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+}
+
+/* ============================================
+   EXPERIENCE RAIL (horizontal, focus-on-hover)
+   Rest is fully legible: crisp, content-sized, fanned.
+   Blur is a CONTRAST effect only — it applies to
+   non-hovered siblings while a card is hovered, and
+   never when nothing is hovered.
+   ============================================ */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* left-aligned to the same edge as the section h2/lede, width-capped */
+.exp-railwrap {
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+}
+
+.exp-rail {
+  /* --ease / --dur now inherit from :root, same values */
+  --cardw: 490px;
+  --fan: 65px;   /* overlap, held at the same ratio to --cardw */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  /* the box is exactly the fan width (3 cards minus 2 overlaps), so centring
+     the box centres the RENDERED fan — the negative margins are already
+     accounted for in the flex container width */
+  width: 100%;
+  max-width: calc(var(--cardw) * 3 - var(--fan) * 2);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2.5rem 0 1.5rem;
+}
+
+.exp-card {
+  position: relative;
+  flex: 0 1 var(--cardw);
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent) 16%, var(--surface)) 0%,
+    color-mix(in srgb, var(--accent) 3%, var(--surface-2)) 100%);
+  /* soft accent-tinted lift so the cards sit above the plexus background */
+  box-shadow: 0 18px 44px -26px color-mix(in srgb, var(--accent) 45%, transparent);
+  overflow: hidden;
+  /* REST: crisp, full opacity, unscaled */
+  filter: none;
+  opacity: 1;
+  transform-origin: bottom center;
+  transition:
+    flex var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    filter var(--dur) var(--ease),
+    opacity var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+/* fanned hand: 48px overlap, ascending z-index, slight splay */
+.exp-card + .exp-card { margin-left: calc(var(--fan) * -1); }
+.exp-card:nth-child(1) { z-index: 1; transform: rotate(-2deg); }
+.exp-card:nth-child(2) { z-index: 2; transform: rotate(0deg); }
+.exp-card:nth-child(3) { z-index: 3; transform: rotate(2deg); }
+
+.exp-card__inner {
+  position: relative;
+  display: block;
+  padding: 3.9rem 1.75rem 0;   /* matches the panel gap below for symmetry */
+}
+.exp-rail:not(.has-open) .exp-card:not(:last-child) .exp-card__logo { margin-right: calc(var(--fan) * -1); }
+/* keep content clear of the strip a neighbour overlaps */
+.exp-card:not(:last-child) .exp-card__inner { padding-right: calc(1.75rem + var(--fan)); }
+.exp-rail.has-open .exp-card__inner,
+.exp-card.is-open .exp-card__inner { padding-right: 1.75rem; }
+
+/* --- logo / wordmark --- */
+.exp-card__logo {
+  position: relative;
+  min-height: 140px;   /* panel proportions unchanged */
+  /* equal gaps: cancel the neighbour-clearance padding so the panel is
+     centred on the card box rather than flush-left with a wide right gap */
+  margin-bottom: 3.9rem;
+  flex-direction: column;
+  gap: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.75rem;
+}
+/* The real SVG takes over once it loads (.has-logo, set in experience-rail.js).
+   Until a file exists at public/logos/, the letterspaced wordmark stands in. */
+.exp-card__markwrap,
+.exp-card__lname { display: none; }
+.exp-card__logo.has-logo .exp-card__markwrap,
+.exp-card__logo.has-logo .exp-card__lname { display: block; }
+.exp-card__logo.has-logo .exp-card__wordmark { display: none; }
+/* a mark that already spells the company out doesn't need the name under it.
+   visibility, not display, so its box still reserves the same height and the
+   three marks stay on one line across the rail */
+.exp-card__logo.logo--wordmark.has-logo .exp-card__lname { visibility: hidden; }
+
+.exp-card__markwrap {
+  position: relative;
+  width: 60%;              /* mark occupies 55-65% of the panel width */
+  /* per-logo, from logoHeight in experience-data.js — the marks are cropped to
+     their ink, so height alone balances a square mark against a wide wordmark */
+  height: var(--mark-h, 48px);
+}
+/* single-path marks: masked so they render in the card accent colour */
+.exp-card__mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  -webkit-mask: var(--logo) center / contain no-repeat;
+  mask: var(--logo) center / contain no-repeat;
+}
+.exp-card__logo img { display: none; width: 100%; height: 100%; object-fit: contain; }
+/* multi-colour marks: show the file itself, dialled back so it does not
+   fight the card tint */
+.exp-card__logo.logo--multi .exp-card__mark { display: none; }
+.exp-card__logo.logo--multi.has-logo img { display: block; opacity: 0.9; }
+
+.exp-card__lname {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  color: var(--accent);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+/* text wordmark stand-in — reads as intentional, unlike a lone letter */
+.exp-card__wordmark {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: var(--accent);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* --- meta + title: one line / two lines, shared baseline --- */
+.exp-card__meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  line-height: 1.45;
+  color: var(--accent);
+  /* now holds company + year + project descriptor, so it wraps rather than
+     clipping; two lines are reserved to keep the title baselines aligned */
+  min-height: calc(2 * 1.45em);
+  margin-bottom: 0.6rem;
+}
+.exp-card__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.3;
+  min-height: calc(2 * 1.3em);   /* exactly two lines on every card */
+  text-wrap: balance;
+  color: var(--text);
+}
+
+/* --- hover teaser: summary + pills (reserves no space at rest) ---
+   max-height rather than grid 0fr->1fr: the teaser has TWO children, and a
+   single-row 0fr template leaves the second in an implicit auto row that
+   never collapses. */
+.exp-card__teaser {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.exp-card__teaser > * {
+  transform: translateY(10px);
+  transition: transform var(--dur) var(--ease);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.exp-card__summary {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  padding-top: 0.9rem;
+}
+.exp-card__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.8rem;
+}
+.exp-pill {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-radius: 999px;
+  padding: 0.24rem 0.58rem;
+}
+
+/* --- thin bottom rule + click cue --- */
+.exp-card__foot {
+  margin-top: 2.2rem;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  padding: 0.9rem 0;
+}
+.exp-card__cue {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+/* --- open body (click payload) --- */
+.exp-card__bodywrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur) var(--ease);
+}
+.exp-card__body {
+  overflow: hidden;
+  min-height: 0;
+}
+.exp-card__body > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.exp-card__body p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.62;
+  margin-bottom: 0.9rem;
+}
+.exp-card__body > :first-child { margin-top: 1.2rem; }
+
+/* --- metric row: accent middot line under the open title (not pills) --- */
+.exp-card__metrics {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.81rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  word-spacing: 0.3em;
+  line-height: 1.7;
+  color: var(--accent);
+  opacity: 0.85;
+  margin: 0.65rem 0 1.9rem;
+}
+.exp-card.is-open .exp-card__metrics { display: block; }
+
+/* --- open state: two-column grid of inset panels --- */
+.exp-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 32px;
+  align-items: stretch;
+}
+.exp-card__col,
+.exp-card__side {
+  /* same inset-panel treatment as the company block */
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 1.5rem 1.6rem;
+}
+
+/* ROLE left / DATE right on a shared baseline, hairline rule beneath */
+.exp-card__roleline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--accent) !important;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.exp-card__date { white-space: nowrap; flex-shrink: 0; }
+.exp-card__descriptor { font-size: 0.64rem; line-height: 1.5; }
+
+.exp-card__lede {
+  font-size: 1rem !important;
+  line-height: 1.6;
+  color: var(--text) !important;
+  opacity: 0.9;
+  margin-bottom: 1.3rem !important;
+}
+.exp-card__col p:not(.exp-card__roleline):not(.exp-card__lede) {
+  margin-bottom: 1.1rem;
+}
+.exp-card__col p:last-child { margin-bottom: 0; }
+
+/* --- sidebar: TECH STACK, one full-width pill per row --- */
+.exp-card__sidelabel {
+  font-family: var(--font-mono);
+  font-size: 0.68rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-faint) !important;
+  margin-bottom: 1rem !important;
+}
+.exp-card__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.exp-stackpill {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.81rem;
+  line-height: 1.3;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border-radius: 999px;
+  padding: 10px 18px;
+  white-space: nowrap;
+}
+
+/* --- collapsed spine (open state) --- */
+.exp-card__spine {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+.exp-card__spine-mark {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+.exp-card__spine-name {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* --- full-card trigger (real <button>) --- */
+.exp-card__trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: inherit;
+}
+.exp-card__trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ============ STATE 2 — hover / focus (no card open) ============ */
+/* blur only the OTHER cards, and only while one is actually hovered */
+.exp-rail:not(.has-open):has(.exp-card:hover) .exp-card:not(:hover),
+.exp-rail:not(.has-open):has(.exp-card__trigger:focus-visible) .exp-card:not(:focus-within) {
+  filter: blur(4px);
+  opacity: 0.35;
+}
+/* siblings slide away from the focused card */
+.exp-rail:not(.has-open) .exp-card:has(~ .exp-card:is(:hover, :focus-within)) {
+  transform: rotate(-2deg) translateX(-16px);
+}
+.exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within) ~ .exp-card {
+  transform: rotate(2deg) translateX(16px);
+}
+/* the focused card straightens and lifts */
+.exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within) {
+  z-index: 6;
+  filter: blur(0);
+  opacity: 1;
+  transform: rotate(0deg) scale(1.04) translateY(-12px);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 24px 70px -24px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within) .exp-card__teaser {
+  max-height: 260px;
+  opacity: 1;
+}
+.exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within) .exp-card__teaser > * {
+  transform: translateY(0);
+}
+.exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within) .exp-card__cue { opacity: 1; }
+
+/* ============ STATE 3 — open (horizontal accordion) ============ */
+.exp-rail.has-open .exp-card {
+  margin-left: 0;
+  align-self: stretch;
+  flex: 0 0 72px;
+  max-width: none;
+  transform: none;
+  /* recessed, but legible — a spine has to read as a clickable entry */
+  filter: blur(2.5px);
+  opacity: 0.62;
+}
+.exp-rail.has-open .exp-card + .exp-card { margin-left: 0.75rem; }
+
+/* collapsing cards: inner pinned to rest width so text cannot re-wrap */
+.exp-rail.has-open .exp-card:not(.is-open) .exp-card__inner {
+  width: var(--restw, 340px);
+  opacity: 0;
+  pointer-events: none;
+}
+.exp-rail.has-open .exp-card:not(.is-open) .exp-card__spine { opacity: 1; }
+/* while open, hovering a sibling is a brightness lift only */
+.exp-rail.has-open .exp-card:not(.is-open):has(.exp-card__trigger:hover),
+.exp-rail.has-open .exp-card:not(.is-open):has(.exp-card__trigger:focus-visible) {
+  opacity: 0.88;
+  filter: blur(1.5px);
+}
+
+.exp-rail.has-open .exp-card.is-open {
+  flex: 1 1 70%;
+  filter: blur(0);
+  opacity: 1;
+  z-index: 6;
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 24px 70px -24px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.exp-card.is-open .exp-card__inner { padding: 2rem 2.25rem 2.25rem; }
+/* company block reads as a banner once open, not the dominant element */
+.exp-card.is-open .exp-card__logo { min-height: 130px; margin-bottom: 1.6rem; }
+.exp-card.is-open .exp-card__meta { display: none; }
+.exp-card.is-open .exp-card__title { font-size: 1.75rem; min-height: 0; }
+/* summary + pills belong to the hover teaser only; open uses lede + metric row */
+.exp-card.is-open .exp-card__teaser { display: none; }
+.exp-card.is-open .exp-card__bodywrap { grid-template-rows: 1fr; }
+.exp-card.is-open .exp-card__body > * {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+.exp-card.is-open .exp-card__foot { display: none; }
+
+@media (max-width: 1280px) {
+  /* cards are narrower here — step the type down a notch so titles still fit
+     two lines and the meta line never ellipsises */
+  .exp-rail { --fan: 44px; }
+  .exp-card__inner { padding: 3.25rem 1.5rem 0; }
+  .exp-card:not(:last-child) .exp-card__inner { padding-right: calc(1.5rem + var(--fan)); }
+  .exp-card__logo { min-height: 120px; margin-bottom: 3.25rem; }
+  .exp-card__title { font-size: 1.15rem; }
+  .exp-card__meta { font-size: 0.56rem; }
+}
+
+/* ============ <900px: open card collapses to one column ============ */
+@media (max-width: 900px) {
+  .exp-card__grid { grid-template-columns: 1fr; gap: 20px; }
+  .exp-card__stack { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .exp-stackpill { width: auto; }
+}
+
+/* ============ <1024px: snap rail, active = centred card ============ */
+@media (max-width: 1023px) {
+  .exp-railwrap { padding: 0; }
+  .exp-rail {
+    max-width: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding: 1.5rem clamp(1.25rem, 5vw, 3rem);
+    scrollbar-width: none;
+  }
+  .exp-rail::-webkit-scrollbar { display: none; }
+  /* no overlap at this size — reclaim the reserved strip for text */
+  .exp-card:not(:last-child) .exp-card__inner { padding-right: 1.5rem; }
+  .exp-rail:not(.has-open) .exp-card:not(:last-child) .exp-card__logo { margin-right: 0; }
+  .exp-card {
+    flex: 0 0 min(340px, 82vw);
+    scroll-snap-align: center;
+    margin-left: 0 !important;
+    transform: none !important;
+  }
+  .exp-card.is-snapped {
+    filter: blur(0);
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+    box-shadow: 0 20px 60px -24px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .exp-card.is-snapped .exp-card__teaser { max-height: 260px; opacity: 1; }
+  .exp-card.is-snapped .exp-card__teaser > * { transform: translateY(0); }
+  .exp-card.is-snapped .exp-card__cue { opacity: 1; }
+  .exp-rail.has-open .exp-card,
+  .exp-rail.has-open .exp-card.is-open { flex: 0 0 min(340px, 82vw); }
+}
+
+/* ============ <768px: vertical stack, tap toggles, no blur ============ */
+@media (max-width: 767px) {
+  .exp-rail {
+    flex-direction: column;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    gap: 1rem;
+    padding: 1.5rem clamp(1.25rem, 5vw, 3rem);
+  }
+  .exp-card,
+  .exp-rail.has-open .exp-card,
+  .exp-rail.has-open .exp-card.is-open {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    /* blur-siblings is a hover idiom — off on touch */
+    filter: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none;
+  }
+  .exp-card__inner,
+  .exp-card:not(:last-child) .exp-card__inner {
+    width: auto !important;
+    opacity: 1 !important;
+    padding: 1.5rem 1.35rem 0;
+  }
+  /* summary + pills visible at rest — no hover to hide behind */
+  .exp-card__teaser { max-height: none; opacity: 1; }
+  .exp-card__teaser > * { transform: none; }
+  .exp-card__cue { opacity: 1; }
+  .exp-card__spine { display: none; }
+  .exp-card__title { min-height: 0; }
+  .exp-card.is-open {
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+}
+
+/* ============ reduced motion: opacity/border only ============ */
+@media (prefers-reduced-motion: reduce) {
+  .exp-card,
+  .exp-card__inner,
+  .exp-card__teaser,
+  .exp-card__teaser > *,
+  .exp-card__bodywrap,
+  .exp-card__body > *,
+  .exp-card__cue,
+  .exp-card__spine {
+    transition: opacity 0.001ms, border-color 0.001ms !important;
+    transform: none !important;
+  }
+  .exp-card,
+  .exp-rail:not(.has-open) .exp-card:is(:hover, :focus-within),
+  .exp-rail.has-open .exp-card { filter: none !important; }
+}
+
+/* ============================================
+   PROJECTS RAIL (horizontal, image-led)
+   ============================================ */
+.rail-outer {
+  position: relative;
+}
+.proj-rail {
+  display: flex;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 1.5rem clamp(1.25rem, 5vw, 3rem) 2.5rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.proj-rail::-webkit-scrollbar { display: none; }
+
+.proj-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(520px, 84vw);
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  scroll-snap-align: center;
+  display: block;
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+/* Same lift-and-bloom as the Skills bento cells, in this card's own accent */
+@media (hover: hover) and (pointer: fine) {
+  .proj-card {
+    transition: transform var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease);
+  }
+  .proj-card:is(:hover, :focus-visible) {
+    z-index: 2;
+    transform: translateY(-6px) scale(1.02);
+    border-color: color-mix(in srgb, var(--card-accent, var(--cyan)) 58%, transparent);
+    box-shadow: 0 26px 62px -26px color-mix(in srgb, var(--card-accent, var(--cyan)) 58%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .proj-card:is(:hover, :focus-visible) { transform: none; }
+}
+
+.proj-card__media { position: absolute; inset: 0; }
+.proj-card__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* No grid texture — just the hue mixed down into obsidian, with a soft corner
+   bloom in the same accent. One rule for all six; the hue comes from --card-accent. */
+.proj-card__fallback {
+  position: absolute;
+  inset: 0;
+  background-color: var(--card-accent-base, var(--surface));
+  background-image: radial-gradient(440px 300px at 78% 6%,
+    color-mix(in srgb, var(--card-accent, var(--cyan)) 20%, transparent),
+    transparent 62%);
+}
+/* The icon is the card's graphic now, not a watermark behind one. Sized off the
+   card width so it scales with the carousel, and parked at 38% height so it
+   centres in the top portion, clear of the title and of the scrim that darkens
+   the lower 60%. Every icon draws to the same 24-unit viewBox at the same
+   stroke width, which is what keeps their weight even across the six. */
+.proj-card__fallback svg {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(12.5rem, 38%);
+  aspect-ratio: 1;
+  height: auto;
+  color: var(--card-accent, var(--cyan));
+  opacity: 0.85;
+  stroke-width: 2;   /* overrides the attribute on each svg — one place to tune */
+}
+/* Below ~640 the card shrinks but the title block doesn't, so the icon has to
+   sit higher and smaller or its lower edge runs under the heading. */
+@media (max-width: 640px) {
+  .proj-card__fallback svg { top: 30%; width: min(9rem, 33%); }
+}
+
+/* legibility scrim behind the resting title */
+.proj-card__scrim {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 60%;
+  background: linear-gradient(transparent, rgba(5, 5, 8, 0.85));
+}
+
+/* whitening veil on hover — image stays visible through it */
+.proj-card__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(238, 240, 244, 0.88);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.proj-card:is(:hover, :focus-visible) .proj-card__veil { opacity: 1; }
+
+.proj-card__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+.proj-card__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--card-accent, var(--cyan));
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+.proj-card__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+.proj-card:is(:hover, :focus-visible) .proj-card__eyebrow { color: var(--card-accent-ink, #3a3a48); }
+.proj-card:is(:hover, :focus-visible) .proj-card__title { color: #101018; text-shadow: none; }
+
+.proj-card__reveal {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease;
+}
+.proj-card:is(:hover, :focus-visible) .proj-card__reveal {
+  max-height: 14rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+.proj-card__hook {
+  color: #2c2c38;
+  font-size: 0.9rem;
+  margin: 0.6rem 0 0.8rem;
+}
+.proj-card__metric {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #101018;
+  background: rgba(16, 16, 24, 0.06);
+  border: 1px solid rgba(16, 16, 24, 0.25);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  margin-bottom: 0.8rem;
+}
+.proj-card__metric b { color: var(--card-accent-ink, #101018); font-weight: 600; }
+.proj-card__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.proj-card__tags .tag {
+  color: #3a3a48;
+  border-color: rgba(16, 16, 24, 0.25);
+}
+
+.rail-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(19, 19, 25, 0.7);
+  backdrop-filter: blur(6px);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.rail-arrow:hover { border-color: var(--cyan); color: var(--cyan); }
+.rail-arrow.left { left: 0.5rem; }
+.rail-arrow.right { right: 0.5rem; }
+@media (max-width: 700px) { .rail-arrow { display: none; } }
+
+/* ============================================
+   PROJECT DETAIL PAGES
+   ============================================ */
+.proj-detail {
+  position: relative;
+  z-index: 1;
+  padding: 9rem 0 4rem;
+  min-height: 70vh;
+}
+.proj-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 2.5rem;
+  transition: color 0.2s ease;
+}
+.proj-detail__back:hover { color: var(--cyan); }
+.proj-detail__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--violet);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+.proj-detail__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  max-width: 24ch;
+  margin-bottom: 1.5rem;
+}
+.proj-detail__links { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.proj-detail__placeholder {
+  margin-top: 2.5rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: clamp(2rem, 6vw, 4rem);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* ============================================
+   SKILLS SECTION
+   ============================================ */
+/* Bento rather than four equal columns: AI/ML is the strongest category, so it
+   takes four of six tracks on the top row and carries the violet treatment.
+   Six tracks (not three or four) because they divide cleanly into 4+2 and 3+3,
+   which is what keeps both rows full — a featured cell beside a stack of three
+   measured 539px tall against 160px of content, i.e. 349px of dead space, since
+   seven pills don't fill that much height. Placement is by area name, so
+   rebalancing means editing the two strings below and nothing else. */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-areas:
+    "ai   ai   ai   ai   lang  lang"
+    "data data data tools tools tools";
+  gap: 1rem;   /* matches the .certs gutter below it */
+}
+/* Every cell carries its own accent, so the violet on AI/ML reads as the top of
+   a scale rather than the one odd tinted box. The tint is a corner-anchored
+   radial that falls off into the same obsidian card base the rest of the page
+   uses, so it sits in the plexus aesthetic instead of on top of it. */
+.skill-group {
+  --accent: var(--violet);
+  position: relative;   /* so the hover lift can raise it over its neighbours */
+  min-height: 240px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: var(--radius);
+  /* One recipe for all four — corner radial over an accent-washed base — with
+     the strength per hue. Violet is the reference at 22/10; the other three are
+     dialled DOWN from that number to land at the same rendered brightness,
+     because cyan, emerald and amber are far more luminous than violet and at
+     an identical 22% they measured ~2x its tint (see --tint notes below). */
+  --tint: 22%;
+  --wash: 10%;
+  background:
+    radial-gradient(120% 100% at 0% 0%,
+      color-mix(in srgb, var(--accent) var(--tint), transparent) 0%,
+      transparent 66%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent) var(--wash), var(--surface)) 0%,
+      color-mix(in srgb, var(--accent) 2%, var(--surface-2)) 100%);
+  padding: 2.4rem 2.5rem;
+}
+/* --tint / --wash are tuned per hue, not shared: measured against the violet
+   reference, these land within 1.15-1.21x of its rendered tint, where a flat
+   22% put them at 1.87-2.16x. */
+.skill-group--ai    { grid-area: ai;    --accent: var(--violet);  --tint: 22%; --wash: 10%; }
+.skill-group--lang  { grid-area: lang;  --accent: var(--cyan);    --tint: 14%; --wash: 6.5%; }
+.skill-group--data  { grid-area: data;  --accent: var(--emerald); --tint: 15%; --wash: 7%; }
+/* amber completes violet/cyan/emerald — the one warm note, and far enough from
+   the violet that the two never read as the same treatment */
+.skill-group--tools { grid-area: tools; --accent: var(--amber);   --tint: 13%; --wash: 6%; }
+
+/* Featured cell — now that all four share the tint recipe, it leads on size,
+   type scale and a stronger border rather than on colour intensity. No resting
+   bloom on any of them; the glow is a hover state. */
+.skill-group--ai {
+  min-height: 300px;
+  padding: 3rem 3.1rem;
+  border-color: color-mix(in srgb, var(--violet) 42%, transparent);
+}
+
+/* Hover: lift and bloom in the cell's OWN accent, so each keeps its identity.
+   Same curve and duration as the Experience rail (:root --ease / --dur), gated
+   the way the case studies gate theirs so a touch device can't get stuck in it. */
+@media (hover: hover) and (pointer: fine) {
+  .skill-group {
+    transition: transform var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease);
+  }
+  .skill-group:hover {
+    z-index: 2;
+    transform: translateY(-6px) scale(1.02);
+    border-color: color-mix(in srgb, var(--accent) 58%, transparent);
+    box-shadow: 0 26px 62px -26px color-mix(in srgb, var(--accent) 58%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-group:hover { transform: none; }
+}
+
+.skill-group__title {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 1.45rem;
+}
+.skill-group--ai .skill-group__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.65rem;
+}
+.skill-group__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.skill-group--ai .skill-group__list { gap: 0.85rem; }
+
+.skill-pill {
+  font-family: var(--font-mono);
+  font-size: 0.98rem;
+  color: var(--text-dim);
+  /* tinted border only — a filled pill at this size would out-shout the heading.
+     Must stay one shorthand-free declaration: a later `border:` would silently
+     reset the accent tint back to grey. */
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: 10px;
+  padding: 0.65rem 1.25rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.skill-pill:hover { color: var(--text); border-color: var(--accent); }
+.skill-group--ai .skill-pill {
+  font-size: 1.06rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 11px;
+  border-color: color-mix(in srgb, var(--violet) 28%, var(--border));
+}
+
+/* Tablet: two tracks, AI still spanning its whole row so it stays the anchor.
+   Languages pairs with Tools rather than with Data: they are the two shortest
+   lists, so the row stretches to about the same height either way, whereas
+   Languages beside Data left ~100px of void. Data takes the full row instead,
+   where its seven pills fill two lines. The cost is that Tools reads before
+   Data in this band only; both are plain text, so the DOM order a screen
+   reader follows is unchanged.
+   Cuts in at 1023 rather than 900: with the larger pills the six-track layout
+   needs the width, and at 901 the featured cell wrapped to five pill rows while
+   Languages managed four, stranding 122px beside it. */
+@media (max-width: 1023px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "ai   ai"
+      "lang tools"
+      "data data";
+  }
+  /* cells are wider here, so content is shorter — the desktop floor would only
+     add blank space under the pills */
+  .skill-group { min-height: 210px; }
+  .skill-group--ai { min-height: 260px; }
+}
+/* One column, featured first — which is already the DOM order. Cuts in at 760
+   rather than 640 because below that the two-track row pairs Languages (the
+   shortest list) with Data (the tallest), and the stretch left ~170px of void
+   in the Languages cell. */
+@media (max-width: 760px) {
+  .skills-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "ai" "lang" "data" "tools";
+  }
+  /* the cells are content-height here, so the desktop min-heights would only
+     add empty space below the pills */
+  .skill-group { min-height: 0; padding: 1.8rem 1.7rem; }
+  .skill-group--ai { min-height: 0; padding: 2.1rem 1.9rem; }
+  .skill-group__title { font-size: 0.92rem; margin-bottom: 1.2rem; }
+  .skill-group--ai .skill-group__title { font-size: 1.1rem; margin-bottom: 1.35rem; }
+  .skill-pill { font-size: 0.84rem; padding: 0.5rem 0.9rem; }
+  .skill-group--ai .skill-pill { font-size: 0.9rem; padding: 0.55rem 1rem; }
+}
+.certs {
+  /* wider than the 1rem bento gutter so the certifications read as their own
+     band rather than another row of the grid above */
+  margin-top: 2rem;
+  display: grid;
+  /* fixed four, not auto-fit: with four cards auto-fit drops to three at tablet
+     and leaves a lone orphan on its own row */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.cert-badge {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  position: relative;   /* so a lifted card sits over its neighbours */
+}
+/* Same lift-and-bloom as the bento cells above, in the violet the star icon
+   already uses. Only the three that are real links react — the pending one is
+   a <div>, so :hover on a.cert-badge can never match it. */
+@media (hover: hover) and (pointer: fine) {
+  .cert-badge {
+    transition: transform var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease);
+  }
+  a.cert-badge:hover {
+    z-index: 2;
+    transform: translateY(-6px) scale(1.02);
+    border-color: color-mix(in srgb, var(--violet) 58%, transparent);
+    box-shadow: 0 26px 62px -26px color-mix(in srgb, var(--violet) 58%, transparent);
+  }
+}
+a.cert-badge { cursor: pointer; }
+a.cert-badge:focus-visible {
+  border-color: color-mix(in srgb, var(--violet) 58%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  a.cert-badge:hover { transform: none; }
+}
+/* credential not issued yet — dimmed to read as not-yet-live, and inert */
+.cert-badge--pending { opacity: 0.6; cursor: default; }
+.cert-badge__icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--violet);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--violet);
+}
+.cert-badge__name { font-size: 0.92rem; font-weight: 600; }
+.cert-badge__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); margin-top: 0.25rem; }
+
+/* Must come after .certs, not with the skills breakpoints above it — the base
+   four-column rule is declared later in the file and would otherwise win on
+   source order, which is exactly what pushed the row off-screen at 320px. */
+@media (max-width: 1023px) {
+  /* 2x2: four across here would be ~190px a card and every title would break
+     to four lines */
+  .certs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .certs { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ============================================
+   CTA FOOTER BAND
+   ============================================ */
+.cta-band {
+  position: relative;
+  z-index: 1;
+  margin: var(--section-pad) clamp(1.25rem, 5vw, 3rem) 0;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 3.5rem);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(500px 300px at 15% 0%, rgba(0,229,255,0.14), transparent 60%),
+    radial-gradient(500px 300px at 85% 100%, rgba(168,85,247,0.16), transparent 60%),
+    var(--surface);
+  text-align: center;
+}
+.cta-band__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.cta-band__sub { color: var(--text-dim); margin-bottom: 2rem; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  background: linear-gradient(100deg, var(--cyan), var(--violet));
+  color: #08080b;
+  font-weight: 600;
+  padding: 0.9rem 1.9rem;
+  border-radius: 10px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -10px var(--cyan-dim); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.85rem 1.7rem;
+  border-radius: 10px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem clamp(1.25rem, 5vw, 3rem) 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
+}
+footer .social { display: flex; gap: 1.25rem; }
+footer .social a { transition: color 0.2s ease; }
+footer .social a:hover { color: var(--cyan); }
+
+/* ============================================
+   ABOUT PAGE SPECIFIC
+   ============================================ */
+.about-hero {
+  position: relative;
+  z-index: 1;
+  padding: 8rem clamp(1.25rem, 5vw, 3rem) 3rem;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.about-hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+}
+.about-hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight: 700;
+  max-width: 16ch;
+  margin-bottom: 1.5rem;
+}
+.about-hero p {
+  max-width: 62ch;
+  color: var(--text-dim);
+  font-size: 1.02rem;
+  margin-bottom: 1rem;
+}
+
+.beyond-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+.beyond-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.beyond-card:hover { border-color: var(--violet); transform: translateY(-4px); }
+.beyond-card__icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+}
+.beyond-card__title { font-weight: 600; font-size: 1.02rem; margin-bottom: 0.5rem; }
+.beyond-card__desc { color: var(--text-dim); font-size: 0.9rem; }
+
+.contact-panel {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  background:
+    radial-gradient(500px 300px at 10% 0%, rgba(0,229,255,0.12), transparent 60%),
+    radial-gradient(500px 300px at 90% 100%, rgba(168,85,247,0.14), transparent 60%),
+    var(--surface);
+  text-align: center;
+}
+.contact-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+/* The hero outgrows the shared 1240px measure: the wider column gap is paid for
+   out of the page's outer margins, not out of the three zones. Below 1200 there
+   are no margins left to spend, so it falls back to .wrap. */
+@media (min-width: 1200px) {
+  .hero {
+    max-width: min(1420px, 100vw - 3rem);
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* 1024–1199: still three columns, but the right one is too narrow to carry the
+   enlarged contact card — hold it at the old metrics rather than crowd it */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .hero-contact { padding: 1.5rem 1.25rem; }
+  .hero-contact__link { font-size: 0.95rem; gap: 0.75rem; }
+  .hero-contact__badge { width: 38px; height: 38px; border-radius: 10px; }
+  .hero-contact__badge svg { width: 19px; height: 19px; }
+}
+
+@media (max-width: 1023px) {
+  .hero {
+    min-height: auto;
+    padding-top: 6.5rem;
+    padding-bottom: 3rem;
+  }
+  /* stack: About → photos/wheel → Contact; the column gap carries over as the
+     vertical rhythm between the three zones */
+  .hero__grid { grid-template-columns: 1fr; gap: 3rem; }
+  /* stacked, the stage spans the page — sized off the viewport again, not its
+     own width, or it would be as tall as the container is wide */
+  .hero__stage { aspect-ratio: auto; width: 100%; height: min(56vh, 460px); max-height: none; }
+  /* capped to the container instead of tracking the stage — stacked, the stage
+     is the full page width and 86% of that is far too big. The 2% insets come
+     back with it: only the enlarged desktop frames needed that stage height. */
+  .hero__frame { width: min(62%, 280px); }
+  .hero__frame--1 { top: 2%; }
+  .hero__frame--2 { bottom: 2%; }
+  .hero__aside { max-width: 420px; }
+}
+
+/* columns get tight below this, and the taller text block would run into
+   the scroll cue — drop the decoration rather than crowd the text */
+@media (max-width: 1200px) {
+  .hero__scroll { display: none; }
+}
+
+@media (max-width: 640px) {
+  .stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat:last-child { border-bottom: none; }
+
+  /* On a phone the desktop bump crowds the measure — take a smaller one.
+     Legibility of the line length wins over matching the desktop step. */
+  .hero__title { font-size: clamp(1.95rem, 8.4vw, 2.3rem); }
+  .hero__intro { font-size: 1.06rem; }
+  .hero__sub { font-size: 0.92rem; }
+  .hero-contact { padding: 1.6rem 1.45rem; }
+  .hero-contact__link { font-size: 1rem; gap: 0.85rem; }
+  .hero-contact__badge { width: 40px; height: 40px; }
+  .hero-contact__badge svg { width: 20px; height: 20px; }
+}

@@ -1,0 +1,174 @@
+/* ============================================
+   NLP CASE STUDY — page-specific components
+   Loaded after case-study.css, which supplies the shared system
+   (tokens, .cs-wrap, .cs-sechead, .cs-stats, tables, .cs-eq,
+   .cs-two, .cs-panel, pills, section rhythm).
+   Only components unique to this page live here.
+   ============================================ */
+/* ---- 02 stage verdicts ----
+   The stage list itself is now .cs-stages / .cs-stage in case-study.css. */
+.nlp-verdict {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.nlp-verdict.keep { color: var(--emerald); }
+.nlp-verdict.drop { color: var(--rose); }
+
+/* ---- 03 tokenisation demo ---- */
+.nlp-demo {
+  background: rgba(255, 255, 255, .012);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.nlp-demo textarea {
+  width: 100%;
+  display: block;
+  background: #0B0B0D;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--cs-text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  padding: 20px 22px;
+  resize: vertical;
+  min-height: 92px;
+  outline: none;
+}
+.nlp-demo textarea:focus { box-shadow: inset 0 -2px 0 var(--cs-violet); }
+.nlp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+}
+.nlp-step {
+  background: #0B0B0D;
+  padding: 20px 22px;
+  min-height: 180px;
+}
+.nlp-step h4 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: var(--dim);
+  margin: 0 0 14px;
+}
+.nlp-out {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #C6C6CE;
+  word-break: break-word;
+}
+.nlp-tok {
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  padding: 2px 7px;
+  margin: 0 5px 6px 0;
+  display: inline-block;
+  background: rgba(255, 255, 255, .02);
+}
+/* stop words stay visible — seeing what is discarded is the point */
+.nlp-tok.stop { color: #4C4C55; border-style: dashed; text-decoration: line-through; }
+.nlp-tok.bi { border-color: rgba(139, 92, 246, .45); color: #C4B5FD; }
+.nlp-tok.tri { border-color: rgba(34, 211, 238, .40); color: #A5E9F5; }
+.nlp-count {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--dim);
+  margin-top: 14px;
+  display: block;
+  letter-spacing: .02em;
+}
+
+/* ---- muted trailing note ----
+   .cs-tnote is mono 11px, right for a data footnote but not for the
+   paragraph-length notes on this page. */
+.nlp-note {
+  margin-top: 24px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 78ch;
+}
+
+/* ---- 06 derivation list ---- */
+.nlp-derivation { list-style: none; padding: 0; margin: 0; counter-reset: d; }
+.nlp-derivation li {
+  padding: 16px 0 16px 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, .055);
+  position: relative;
+  counter-increment: d;
+}
+.nlp-derivation li:last-child { border-bottom: 0; padding-bottom: 0; }
+.nlp-derivation li::before {
+  content: counter(d);
+  position: absolute;
+  left: 0;
+  top: 16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--cs-violet);
+  border: 1px solid rgba(139, 92, 246, .35);
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+}
+.nlp-derivation .step {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--cs-cyan);
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+.nlp-derivation p { margin: 0; font-size: 14px; color: var(--muted); max-width: none; }
+
+/* ---- tables ----
+   The shared .cs table sets min-width:800px and scrolls. The experiment
+   ladder is narrow enough to reflow instead, which keeps it readable on a
+   phone without a horizontal scroll trap. */
+/* Dropping the shared 800px floor lets these tables reflow instead of
+   scrolling. .cs-tablewrap keeps overflow-x:auto as a safety net — clipping
+   here would silently drop the Decision column rather than let it scroll. */
+.cs .nlp-table { min-width: 0; }
+.cs .nlp-table td.id { font-family: var(--font-mono); font-size: 12.5px; color: var(--cs-text); }
+.cs .nlp-table td.dec { font-family: var(--font-mono); font-size: 12.5px; text-align: right; }
+.cs .nlp-table th.dec { text-align: right; }
+/* Scoped past `.cs tr.nlp-win td` (0,2,2) below, which would otherwise
+   repaint the highlighted row's decision cell in body colour. */
+.cs .nlp-table td.nlp-keep { color: var(--emerald); }
+.cs .nlp-table td.nlp-drop { color: var(--rose); }
+.cs .nlp-table td.nlp-base { color: var(--dim); }
+/* winner rows: cyan inset rule on the first cell + brighter numerals */
+.cs tr.nlp-win td { background: rgba(34, 211, 238, .045); color: var(--cs-text); }
+.cs tr.nlp-win td:first-child { box-shadow: inset 2px 0 0 var(--cs-cyan); }
+.cs tr.nlp-win td.n { color: var(--cs-cyan); }
+
+/* ---- responsive ---- */
+@media (max-width: 940px) {
+  .nlp-steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* shrink rather than scroll — see the .nlp-table note above */
+  .cs .nlp-table { font-size: 12.5px; }
+  .cs .nlp-table th, .cs .nlp-table td { padding-left: 7px; padding-right: 7px; }
+  .cs .nlp-table td.n, .cs .nlp-table td.id, .cs .nlp-table td.dec { font-size: 11px; }
+  .cs .nlp-table thead th {
+    font-size: 9.5px;
+    letter-spacing: .04em;
+    padding-bottom: 10px;
+    /* "CONFIGURATION" is a single 13-char word; without this it sets a
+       min-content floor wide enough to push Decision off the table */
+    overflow-wrap: anywhere;
+  }
+  .nlp-demo textarea, .nlp-step { padding-left: 16px; padding-right: 16px; }
+}
