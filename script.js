@@ -394,8 +394,8 @@ document.querySelectorAll('img[data-fallback]').forEach(img => {
   function apply(p) {
     // photos static 0–0.15, split 0.15–0.85, fully clear by 0.85
     const t = clamp((p - 0.15) / 0.7, 0, 1);
-    f1.style.transform = 'translate(' + (-160 * t) + '%, ' + (-140 * t) + '%) rotate(' + (-6 - 10 * t) + 'deg)';
-    f2.style.transform = 'translate(' + (160 * t) + '%, ' + (140 * t) + '%) rotate(' + (5 + 10 * t) + 'deg)';
+    f1.style.transform = 'translate(' + (-11 - 149 * t) + '%, ' + (-4 - 136 * t) + '%) rotate(' + (-15 - 10 * t) + 'deg)';
+    f2.style.transform = 'translate(' + (11 + 149 * t) + '%, ' + (4 + 136 * t) + '%) rotate(' + (11 + 10 * t) + 'deg)';
     wheelwrap.style.opacity = (0.25 + 0.75 * t).toFixed(3);
     wheelwrap.style.transform = 'scale(' + (0.92 + 0.08 * t).toFixed(4) + ')';
   }
